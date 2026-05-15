@@ -1,0 +1,30 @@
+import { lazy } from 'react';
+
+/** 路由懒加载 - 按需加载页面组件 */
+export const Home = lazy(() => import('../pages/Home'));
+export const GiftsGiven = lazy(() => import('../pages/GiftsGiven'));
+export const GiftsGivenDetail = lazy(() => import('../pages/GiftsGivenDetail'));
+export const GiftGivenForm = lazy(() => import('../pages/GiftGivenForm'));
+export const GiftsReceived = lazy(() => import('../pages/GiftsReceived'));
+export const GiftsReceivedDetail = lazy(() => import('../pages/GiftsReceivedDetail'));
+export const GiftReceivedForm = lazy(() => import('../pages/GiftReceivedForm'));
+export const ContactsList = lazy(() => import('../pages/ContactsList'));
+export const ContactForm = lazy(() => import('../pages/ContactForm'));
+export const ContactDetail = lazy(() => import('../pages/ContactDetail'));
+export const GiftBookList = lazy(() => import('../pages/GiftBookList'));
+export const GiftBookForm = lazy(() => import('../pages/GiftBookForm'));
+export const GiftBookDetail = lazy(() => import('../pages/GiftBookDetail'));
+export const Query = lazy(() => import('../pages/Query'));
+export const Profile = lazy(() => import('../pages/Profile'));
+export const ImportPage = lazy(() => import('../pages/ImportPage'));
+export const ExportPage = lazy(() => import('../pages/ExportPage'));
+export const BackupPage = lazy(() => import('../pages/BackupPage'));
+export const ReasonsList = lazy(() => import('../pages/ReasonsList'));
+export const ReasonForm = lazy(() => import('../pages/ReasonForm'));
+export const ContactTypesList = lazy(() => import('../pages/ContactTypesList'));
+export const ContactTypeForm = lazy(() => import('../pages/ContactTypeForm'));
+export const Login = lazy(() => import('../pages/Login'));
+export const Register = lazy(() => import('../pages/Register'));
+export const AdminLogin = lazy(() => import('../pages/AdminLogin'));
+export const AdminUsers = lazy(() => import('../pages/AdminUsers'));
+export const AdminSystem = lazy(() => import('../pages/AdminSystem'));

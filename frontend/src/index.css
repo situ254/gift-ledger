@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@theme {
+  --color-primary-50: #E0F2F1;
+  --color-primary-100: #B2DFDB;
+  --color-primary-200: #80CBC4;
+  --color-primary-300: #4DB6AC;
+  --color-primary-400: #26A69A;
+  --color-primary-500: #009688;
+  --color-primary-600: #00897B;
+  --color-primary-700: #00796B;
+  --color-primary-800: #00695C;
+  --color-primary-900: #004D40;
+}
+
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--color-primary-500);
+  padding-inline: 1rem;
+  padding-block: 0.75rem;
+  color: var(--color-white);
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+}
+
+.page-header-rounded {
+  border-bottom-right-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+  background-color: var(--color-primary-500);
+  padding-inline: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  color: var(--color-white);
+}
+
+.page-container {
+  padding-inline: 1rem;
+  padding-block: 0.75rem;
+  padding-bottom: 5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.btn-primary {
+  border-radius: 0.5rem;
+  background-color: var(--color-primary-500);
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-weight: 500;
+  color: var(--color-white);
+  transition: color, background-color, border-color;
+  cursor: pointer;
+}
+.btn-primary:hover { background-color: var(--color-primary-600); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-outline {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-primary-500);
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-weight: 500;
+  color: var(--color-primary-500);
+  cursor: pointer;
+}
+.btn-outline:hover { background-color: var(--color-primary-500); color: var(--color-white); }
+
+.input-field {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  width: 100%;
+  padding-inline: 0.75rem;
+  padding-block: 0.5rem;
+  color: var(--color-gray-900);
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.2);
+}
+.dark .input-field {
+  border-color: var(--color-gray-600);
+  background-color: var(--color-gray-700);
+  color: var(--color-white);
+}
+
+.select-field {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  width: 100%;
+  padding-inline: 0.75rem;
+  padding-block: 0.5rem;
+  color: var(--color-gray-900);
+}
+.select-field:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.2);
+}
+.dark .select-field {
+  border-color: var(--color-gray-600);
+  background-color: var(--color-gray-700);
+  color: var(--color-white);
+}
+
+.card {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-gray-100);
+  background-color: var(--color-white);
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+}
+.dark .card {
+  border-color: var(--color-gray-700);
+  background-color: var(--color-gray-800);
+}
+
+.badge {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  display: inline-block;
+}
+.badge-primary {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+}
+.dark .badge-primary {
+  background-color: rgba(0, 150, 136, 0.2);
+  color: #80CBC4;
+}
+.badge-blue {
+  background-color: #EFF6FF;
+  color: #2563EB;
+}
+.dark .badge-blue {
+  background-color: rgba(30, 64, 175, 0.3);
+  color: #93C5FD;
+}
+.badge-orange {
+  background-color: #FFF7ED;
+  color: #EA580C;
+}
+.dark .badge-orange {
+  background-color: rgba(154, 52, 18, 0.3);
+  color: #FDBA74;
+}
+.badge-purple {
+  background-color: #FAF5FF;
+  color: #9333EA;
+}
+.dark .badge-purple {
+  background-color: rgba(107, 33, 168, 0.3);
+  color: #C084FC;
+}
+.badge-gray {
+  background-color: #F9FAFB;
+  color: #4B5563;
+}
+.dark .badge-gray {
+  background-color: rgba(55, 65, 81, 1);
+  color: #D1D5DB;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

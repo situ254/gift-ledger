@@ -27,6 +27,18 @@ export default function GiftsGivenDetail() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const handleDelete = useCallback(async (e, giftId) => {
+    e.stopPropagation();
+    if (!window.confirm('确定删除该随礼记录？')) return;
+    try {
+      await giftsGivenApi.delete(giftId);
+      setGifts(prev => prev.filter(g => g.id !== giftId));
+      toast.success(MSG.DELETE_SUCCESS);
+    } catch {
+      toast.error(MSG.DELETE_FAIL);
+    }
+  }, []);
+
   const reasonGroups = useMemo(() => {
     const map = {};
     gifts.forEach(g => {
@@ -80,6 +92,11 @@ export default function GiftsGivenDetail() {
                   <div className="text-xs text-gray-400">{monthDay(g.gift_date)}</div>
                 </div>
                 <span className="font-bold text-purple-500 ml-3">{formatCurrency(g.amount)}</span>
+                <button
+                  onClick={(e) => handleDelete(e, g.id)}
+                  className="ml-3 px-2 py-1 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/20 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex-shrink-0">
+                  删除
+                </button>
               </div>
             ))}
           </div>

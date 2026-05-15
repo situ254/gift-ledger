@@ -8,8 +8,8 @@ import toast from 'react-hot-toast';
 
 const TABS = [
   { key: 'summary', label: '收/随礼汇总' },
-  { key: 'iOwe', label: '我差别人' },
-  { key: 'oweMe', label: '别人差我' },
+  { key: 'iOwe', label: '我差别人礼' },
+  { key: 'oweMe', label: '别人差我礼' },
 ];
 
 const SUB_TABS = [
@@ -113,11 +113,15 @@ export default function Query() {
         )}
         {activeTab === 'iOwe' && (
           <div className="space-y-2">
-            {iOwe.length === 0 ? <div className="text-center py-12 text-gray-400">暂无数据</div>
-              : iOwe.map((item, idx) => (
+            {iOwe.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <div className="text-4xl mb-2">✅</div>
+                <div>我差别人礼：0 元</div>
+              </div>
+            ) : iOwe.map((item, idx) => (
                 <div key={idx} className="card flex items-center justify-between">
-                  <span className="font-medium text-gray-800 dark:text-white">{item.name}</span>
-                  <span className="font-bold text-green-500">{formatCurrency(item.amount)}</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                  <span className="font-bold text-green-500">{formatCurrency(Math.abs(item.net))}</span>
                 </div>
               ))
             }
@@ -125,11 +129,15 @@ export default function Query() {
         )}
         {activeTab === 'oweMe' && (
           <div className="space-y-2">
-            {oweMe.length === 0 ? <div className="text-center py-12 text-gray-400">暂无数据</div>
-              : oweMe.map((item, idx) => (
+            {oweMe.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <div className="text-4xl mb-2">✅</div>
+                <div>别人差我礼：0 元</div>
+              </div>
+            ) : oweMe.map((item, idx) => (
                 <div key={idx} className="card flex items-center justify-between">
-                  <span className="font-medium text-gray-800 dark:text-white">{item.name}</span>
-                  <span className="font-bold text-red-500">{formatCurrency(item.amount)}</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                  <span className="font-bold text-red-500">{formatCurrency(Math.abs(item.net))}</span>
                 </div>
               ))
             }

@@ -32,19 +32,22 @@ export default function ContactDetail() {
       <PageHeader title={`【${decodedName}】人情往来`} variant="rounded"
         backOnClick={() => navigate(-1)} />
       <div className="page-container -mt-4">
-        <div className="flex gap-2 mb-3">
-          {[
-            { label: '收礼', value: total_received, color: 'blue', key: 'received', count: received_records.length },
-            { label: '随礼', value: total_given, color: 'purple', key: 'given', count: given_records.length },
-          ].map(({ label, value, color, key, count }) => (
-            <div key={key} className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-              <div className={`font-bold text-${color}-500`}>{formatCurrency(value)}</div>
-            </div>
-          ))}
-          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
-            <div className="text-xs text-gray-500 dark:text-gray-400">净额</div>
-            <div className={`font-bold ${net >= 0 ? 'text-green-500' : 'text-red-500'}`}>{formatCurrency(net)}</div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">收礼总次数</div>
+            <div className="font-bold text-blue-500 text-lg">{received_records.length}<span className="text-xs font-normal ml-0.5">笔</span></div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">收礼总金额（元）</div>
+            <div className="font-bold text-blue-500 text-lg">{formatCurrency(total_received)}</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">随礼总次数</div>
+            <div className="font-bold text-purple-500 text-lg">{given_records.length}<span className="text-xs font-normal ml-0.5">笔</span></div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">随礼总金额（元）</div>
+            <div className="font-bold text-purple-500 text-lg">{formatCurrency(total_given)}</div>
           </div>
         </div>
 

@@ -76,13 +76,13 @@ export default function Home() {
 
         {oweMe.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔻 差我礼</h2>
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔻 别人差我礼</h2>
             <div className="space-y-2">
               {oweMe.map(item => (
-                <CardItem key={item.name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.name))}>
+                <CardItem key={item.contact_name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.contact_name))}>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-800 dark:text-white">{item.name}</span>
-                    <span className="font-bold text-red-500">{formatCurrency(item.amount)}</span>
+                    <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                    <span className="font-bold text-red-500">{formatCurrency(Math.abs(item.net))}</span>
                   </div>
                 </CardItem>
               ))}
@@ -92,13 +92,13 @@ export default function Home() {
 
         {iOwe.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔺 我差礼</h2>
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔺 我差别人礼</h2>
             <div className="space-y-2">
               {iOwe.map(item => (
-                <CardItem key={item.name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.name))}>
+                <CardItem key={item.contact_name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.contact_name))}>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-800 dark:text-white">{item.name}</span>
-                    <span className="font-bold text-green-500">{formatCurrency(item.amount)}</span>
+                    <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                    <span className="font-bold text-green-500">{formatCurrency(Math.abs(item.net))}</span>
                   </div>
                 </CardItem>
               ))}

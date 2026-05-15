@@ -20,6 +20,8 @@ ENV DB_PASSWORD=root
 ENV DB_NAME=gift_ledger
 ENV JWT_SECRET=gift_ledger_secret_key_2024
 ENV NODE_ENV=production
+ENV ADMIN_USERNAME=admin
+ENV ADMIN_PASSWORD=admin123
 
 EXPOSE 9205
 

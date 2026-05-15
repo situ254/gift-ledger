@@ -148,14 +148,16 @@ async function initDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    // 创建默认管理员账号
-    const [adminRows] = await pool.query("SELECT id FROM users WHERE username = 'admin'");
+    // 创建默认管理员账号（用户名和密码可通过环境变量配置）
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const [adminRows] = await pool.query("SELECT id FROM users WHERE username = ?", [adminUsername]);
     if (adminRows.length === 0) {
       const bcrypt = require('bcryptjs');
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await pool.query("INSERT INTO users (username, password_hash, role) VALUES ('admin', ?, 'admin')", [hashedPassword]);
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await pool.query("INSERT INTO users (username, password_hash, role) VALUES (?, ?, 'admin')", [adminUsername, hashedPassword]);
       // 初始化管理员默认数据
-      const [adminUser] = await pool.query("SELECT id FROM users WHERE username = 'admin'");
+      const [adminUser] = await pool.query("SELECT id FROM users WHERE username = ?", [adminUsername]);
       const adminId = adminUser[0].id;
       const defaultReasons = ['丧事', '孝敬', '其它', '压岁', '生日', '生子', '婚礼'];
       const defaultContactTypes = ['领导', '其它', '同学', '朋友', '亲戚', '同事'];
@@ -165,7 +167,7 @@ async function initDatabase() {
       for (const name of defaultContactTypes) {
         await pool.query('INSERT INTO contact_types (user_id, name) VALUES (?, ?)', [adminId, name]);
       }
-      console.log('Default admin account created: admin / admin123');
+      console.log(`Default admin account created: ${adminUsername} / ${adminPassword}`);
     }
 
     console.log('Database initialized successfully');

@@ -26,11 +26,12 @@ export default function ContactDetail() {
   const { total_received = 0, total_given = 0, net = 0, received_records = [], given_records = [] } = detail || {};
 
   // 人情往来差额：收礼 - 随礼 = net
-  // net > 0 → 别人差我礼（我收的多，别人欠我）→ 红色
-  // net < 0 → 我差别人礼（我送的多，我欠别人）→ 绿色
+  // net = total_received - total_given
+  // net > 0 → 收礼 > 随礼 → 我差别人礼（我收的多，我欠别人礼）→ 绿色
+  // net < 0 → 收礼 < 随礼 → 别人差我礼（我随的多，别人欠我礼）→ 红色
   // net === 0 → 收支平衡 → 灰色
-  const balanceLabel = net > 0 ? `别人差我 ${formatCurrency(net)}` : net < 0 ? `我差别人 ${formatCurrency(Math.abs(net))}` : '收支平衡';
-  const balanceColor = net > 0 ? 'text-red-500' : net < 0 ? 'text-green-500' : 'text-gray-500';
+  const balanceLabel = net > 0 ? `我差别人 ${formatCurrency(net)}` : net < 0 ? `别人差我 ${formatCurrency(Math.abs(net))}` : '收支平衡';
+  const balanceColor = net > 0 ? 'text-green-500' : net < 0 ? 'text-red-500' : 'text-gray-500';
 
   if (loading) return <LoadingSpinner />;
 

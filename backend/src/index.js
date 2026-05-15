@@ -104,6 +104,7 @@ async function initDatabase() {
         amount DECIMAL(12,2) NOT NULL,
         gift_book_id INT NOT NULL,
         gift_book_date DATE NOT NULL,
+        guests INT DEFAULT 0,
         notes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -111,6 +112,11 @@ async function initDatabase() {
         FOREIGN KEY (gift_book_id) REFERENCES gift_books(id) ON DELETE RESTRICT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
+
+    // 兼容旧表：如无 guests 列则添加
+    try {
+      await pool.query('ALTER TABLE gifts_received ADD COLUMN guests INT DEFAULT 0');
+    } catch (e) { /* 列已存在则忽略 */ }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS gifts_given (

@@ -31,7 +31,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // 新增收礼
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { contact_name, contact_type_id, amount, gift_book_id, gift_book_date, notes } = req.body;
+    const { contact_name, contact_type_id, amount, gift_book_id, guests, notes } = req.body;
     if (!contact_name) return res.status(400).json({ error: '亲友姓名不能为空' });
     if (!amount || amount <= 0) return res.status(400).json({ error: '金额必须大于0' });
     if (!gift_book_id) return res.status(400).json({ error: '请选择所属礼簿' });
@@ -40,8 +40,8 @@ router.post('/', authMiddleware, async (req, res) => {
     if (bookRows.length === 0) return res.status(400).json({ error: '礼簿不存在' });
     const bookDate = bookRows[0].date;
     const [result] = await pool.query(
-      'INSERT INTO gifts_received (user_id, contact_name, contact_type_id, amount, gift_book_id, gift_book_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [req.user.id, contact_name, contact_type_id || null, amount, gift_book_id, bookDate, notes || '']
+      'INSERT INTO gifts_received (user_id, contact_name, contact_type_id, amount, gift_book_id, gift_book_date, guests, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [req.user.id, contact_name, contact_type_id || null, amount, gift_book_id, bookDate, guests || 0, notes || '']
     );
     res.json({ id: result.insertId });
   } catch (err) {
@@ -53,7 +53,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // 更新收礼
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const { contact_name, contact_type_id, amount, gift_book_id, gift_book_date, notes } = req.body;
+    const { contact_name, contact_type_id, amount, gift_book_id, guests, notes } = req.body;
     if (!contact_name) return res.status(400).json({ error: '亲友姓名不能为空' });
     if (!amount || amount <= 0) return res.status(400).json({ error: '金额必须大于0' });
     if (!gift_book_id) return res.status(400).json({ error: '请选择所属礼簿' });
@@ -61,8 +61,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (bookRows.length === 0) return res.status(400).json({ error: '礼簿不存在' });
     const bookDate = bookRows[0].date;
     await pool.query(
-      'UPDATE gifts_received SET contact_name = ?, contact_type_id = ?, amount = ?, gift_book_id = ?, gift_book_date = ?, notes = ? WHERE id = ? AND user_id = ?',
-      [contact_name, contact_type_id || null, amount, gift_book_id, bookDate, notes || '', req.params.id, req.user.id]
+      'UPDATE gifts_received SET contact_name = ?, contact_type_id = ?, amount = ?, gift_book_id = ?, gift_book_date = ?, guests = ?, notes = ? WHERE id = ? AND user_id = ?',
+      [contact_name, contact_type_id || null, amount, gift_book_id, bookDate, guests || 0, notes || '', req.params.id, req.user.id]
     );
     res.json({ success: true });
   } catch (err) {

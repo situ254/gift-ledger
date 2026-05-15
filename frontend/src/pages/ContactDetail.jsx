@@ -25,6 +25,13 @@ export default function ContactDetail() {
 
   const { total_received = 0, total_given = 0, net = 0, received_records = [], given_records = [] } = detail || {};
 
+  // 人情往来差额：收礼 - 随礼 = net
+  // net > 0 → 别人差我礼（我收的多，别人欠我）→ 红色
+  // net < 0 → 我差别人礼（我送的多，我欠别人）→ 绿色
+  // net === 0 → 收支平衡 → 灰色
+  const balanceLabel = net > 0 ? `别人差我 ${formatCurrency(net)}` : net < 0 ? `我差别人 ${formatCurrency(Math.abs(net))}` : '收支平衡';
+  const balanceColor = net > 0 ? 'text-red-500' : net < 0 ? 'text-green-500' : 'text-gray-500';
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -49,6 +56,12 @@ export default function ContactDetail() {
             <div className="text-xs text-gray-500 dark:text-gray-400">随礼总金额（元）</div>
             <div className="font-bold text-purple-500 text-lg">{formatCurrency(total_given)}</div>
           </div>
+        </div>
+
+        {/* 人情往来差额 */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-3 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+          <div className="text-xs text-gray-500 dark:text-gray-400">人情往来差额</div>
+          <div className={`font-bold text-lg ${balanceColor}`}>{balanceLabel}</div>
         </div>
 
         <div className="flex gap-2 mb-3">

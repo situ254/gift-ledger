@@ -1,0 +1,62 @@
+# 构建阶段
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# 复制package文件
+COPY package.json package-lock.json ./
+
+# 安装生产依赖
+RUN npm ci --only=production
+
+# 复制源代码
+COPY src/ ./src/
+
+# 运行时阶段
+FROM node:20-alpine
+
+WORKDIR /app
+
+# 从构建阶段复制依赖
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+
+# 复制前端构建文件（在构建时由脚本复制）
+COPY public/ ./public/
+
+# 创建必要的目录
+RUN mkdir -p /tmp/uploads /data
+
+# 容器元数据
+LABEL maintainer="gift-ledger"
+LABEL description="人情记账系统"
+LABEL org.opencontainers.image.title="Gift Ledger"
+LABEL org.opencontainers.image.description="人情记账系统 - 记录人情往来"
+LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.source="https://github.com/situ254/gift-ledger"
+
+# 环境变量配置
+ENV PORT=9205
+ENV DB_HOST=mysql
+ENV DB_PORT=3306
+ENV DB_USER=root
+ENV DB_PASSWORD=root
+ENV DB_NAME=gift_ledger
+ENV JWT_SECRET=gift_ledger_secret_key_2024
+ENV NODE_ENV=production
+ENV LOG_LEVEL=info
+
+# 管理员账号环境变量（用户可覆盖）
+ENV GIFT_LEDGER_ADMIN_USERNAME=admin
+ENV GIFT_LEDGER_ADMIN_PASSWORD=admin123
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:9205/api/health || exit 1
+
+EXPOSE 9205
+
+# 非root用户运行（安全增强）
+USER node
+
+CMD ["node", "src/index.js"]

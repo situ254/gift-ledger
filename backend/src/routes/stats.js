@@ -61,8 +61,8 @@ router.get('/summary', authMiddleware, async (req, res) => {
       net: c.received - c.given
     })).sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
 
-    const oweMe = netList.filter(c => c.net < 0);   // 随礼>收礼 → 别人差我礼
-    const iOwe = netList.filter(c => c.net > 0);     // 收礼>随礼 → 我差别人礼
+    const oweMe = netList.filter(c => c.net < 0);   // 收礼<随礼 → 别人差我礼（我随的多）
+    const iOwe = netList.filter(c => c.net > 0);     // 收礼>随礼 → 我差别人礼（我收的多）
 
     // 按事由统计（随礼）
     const [byReason] = await pool.query(

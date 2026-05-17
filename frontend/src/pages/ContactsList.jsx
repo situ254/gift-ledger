@@ -32,8 +32,14 @@ export default function ContactsList() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 头部 */}
       <div className="bg-[#4ecdc4] dark:bg-[#3aa89d] text-white pt-4 pb-6 px-4 rounded-b-[2rem]">
-        <div className="flex items-center justify-center relative mb-4">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">亲友录</h1>
+          <button
+            onClick={() => navigate(ROUTES.CONTACTS.NEW)}
+            className="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors"
+          >
+            + 新增
+          </button>
         </div>
       </div>
 
@@ -42,10 +48,10 @@ export default function ContactsList() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-4 py-3">
           <input
             type="text"
-            placeholder={`从${contacts.length}位亲友中搜索`}
+            placeholder={`从 ${contacts.length} 位亲友中搜索`}
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 bg-transparent border-b border-gray-200 dark:border-gray-600 pb-2 text-base focus:outline-none focus:border-[#4ecdc4] dark:focus:border-[#3aa89d] transition-colors"
+            className="w-full text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-transparent border-b border-gray-200 dark:border-gray-600 pb-2 text-base focus:outline-none focus:border-[#4ecdc4] dark:focus:border-[#3aa89d] transition-colors"
           />
         </div>
       </div>
@@ -67,7 +73,7 @@ export default function ContactsList() {
                   idx < filtered.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
                 }`}
               >
-                <div className="text-[#2c7a7b] dark:text-[#6ee7e0] font-medium text-lg">{c.name}</div>
+                <div className="text-teal-700 dark:text-teal-300 font-medium text-lg">{c.name}</div>
                 {c.type_name && (
                   <div className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{c.type_name}</div>
                 )}

@@ -7,6 +7,9 @@ import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
 import toast from 'react-hot-toast';
 
+const DELETE_CONFIRM_MSG = '确定删除这条记录吗？删除后不可恢复。';
+const DELETE_FAIL_MSG = '删除失败，请重试';
+
 const INITIAL_FORM = {
   contact_name: '', contact_type_id: '', reason_id: '',
   gift_date: DEFAULTS.DATE_TODAY(), amount: '', notes: '',
@@ -16,6 +19,7 @@ export default function GiftGivenForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+  const [deleting, setDeleting] = useState(false);
 
   const [reasons, setReasons] = useState([]);
   const [contactTypes, setContactTypes] = useState([]);
@@ -70,6 +74,25 @@ export default function GiftGivenForm() {
     },
   });
 
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm(DELETE_CONFIRM_MSG)) return;
+    setDeleting(true);
+    try {
+      await giftsGivenApi.delete(id);
+      toast.success(MSG.DELETE_SUCCESS);
+      // 返回个人统计页（联系人详情页）
+      const contactName = form.contact_name?.trim();
+      if (contactName) {
+        navigate(ROUTES.CONTACTS.DETAIL(contactName));
+      } else {
+        navigate(ROUTES.GIVEN.LIST);
+      }
+    } catch {
+      toast.error(DELETE_FAIL_MSG);
+      setDeleting(false);
+    }
+  }, [id, form.contact_name, navigate]);
+
   useEffect(() => { loadDropdowns(); }, [loadDropdowns]);
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
 
@@ -78,7 +101,14 @@ export default function GiftGivenForm() {
   return (
     <div>
       <PageHeader title={isEdit ? '修改随礼' : '新增随礼'} variant="flat"
-        backOnClick={() => navigate(ROUTES.GIVEN.LIST)} />
+        backOnClick={() => navigate(ROUTES.GIVEN.LIST)}>
+        {isEdit && (
+          <button onClick={handleDelete} disabled={deleting}
+            className="text-red-500 text-sm font-medium px-3 py-1 border border-red-500 rounded-lg active:scale-95 transition-transform disabled:opacity-50">
+            {deleting ? '删除中...' : '删除'}
+          </button>
+        )}
+      </PageHeader>
       <div className="page-container">
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">

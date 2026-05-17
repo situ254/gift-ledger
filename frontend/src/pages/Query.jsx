@@ -87,9 +87,9 @@ export default function Query() {
               </div>
             </div>
             <div className="card !p-3 flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">净额（收礼 - 随礼）</span>
-              <span className={`font-bold text-lg ${netAmount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {netAmount >= 0 ? '+' : ''}{formatCurrency(netAmount)}
+              <span className="text-sm text-gray-500 dark:text-gray-400">{netAmount > 0 ? '我差别人礼' : netAmount < 0 ? '别人差我礼' : '收支平衡'}</span>
+              <span className={`font-bold text-lg ${netAmount > 0 ? 'text-green-500' : netAmount < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                {formatCurrency(Math.abs(netAmount))}
               </span>
             </div>
             <FilterPills tabs={SUB_TABS} active={subFilter} onChange={setSubFilter} activeColor="primary" />

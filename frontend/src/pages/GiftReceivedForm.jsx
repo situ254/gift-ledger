@@ -7,14 +7,18 @@ import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
 import toast from 'react-hot-toast';
 
+const DELETE_CONFIRM_MSG = '确定删除这条记录吗？删除后不可恢复。';
+const DELETE_FAIL_MSG = '删除失败，请重试';
+
 const INITIAL_FORM = {
-  contact_name: '', contact_type_id: '', amount: '', gift_book_id: '', notes: '',
+  contact_name: '', contact_type_id: '', amount: '', gift_book_id: '', guests: '', notes: '',
 };
 
 export default function GiftReceivedForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+  const [deleting, setDeleting] = useState(false);
 
   const [contactTypes, setContactTypes] = useState([]);
   const [giftBooks, setGiftBooks] = useState([]);
@@ -34,6 +38,7 @@ export default function GiftReceivedForm() {
     contact_type_id: g.contact_type_id ? String(g.contact_type_id) : '',
     amount: g.amount || '',
     gift_book_id: g.gift_book_id ? String(g.gift_book_id) : '',
+    guests: g.guests || '',
     notes: g.notes || '',
   }), []);
 
@@ -54,6 +59,7 @@ export default function GiftReceivedForm() {
         contact_type_id: f.contact_type_id ? Number(f.contact_type_id) : null,
         gift_book_id: Number(f.gift_book_id),
         amount: Number(f.amount),
+        guests: f.guests ? Number(f.guests) : 0,
         notes: f.notes,
       };
       if (isEdit) {
@@ -67,6 +73,24 @@ export default function GiftReceivedForm() {
     },
   });
 
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm(DELETE_CONFIRM_MSG)) return;
+    setDeleting(true);
+    try {
+      await giftsReceivedApi.delete(id);
+      toast.success(MSG.DELETE_SUCCESS);
+      const contactName = form.contact_name?.trim();
+      if (contactName) {
+        navigate(ROUTES.CONTACTS.DETAIL(contactName));
+      } else {
+        navigate(ROUTES.RECEIVED.LIST);
+      }
+    } catch {
+      toast.error(DELETE_FAIL_MSG);
+      setDeleting(false);
+    }
+  }, [id, form.contact_name, navigate]);
+
   useEffect(() => { loadDropdowns(); }, [loadDropdowns]);
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
 
@@ -75,7 +99,14 @@ export default function GiftReceivedForm() {
   return (
     <div>
       <PageHeader title={isEdit ? '修改收礼' : '新增收礼'} variant="flat"
-        backOnClick={() => navigate(ROUTES.RECEIVED.LIST)} />
+        backOnClick={() => navigate(ROUTES.RECEIVED.LIST)}>
+        {isEdit && (
+          <button onClick={handleDelete} disabled={deleting}
+            className="text-red-500 text-sm font-medium px-3 py-1 border border-red-500 rounded-lg active:scale-95 transition-transform disabled:opacity-50">
+            {deleting ? '删除中...' : '删除'}
+          </button>
+        )}
+      </PageHeader>
       <div className="page-container">
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -90,15 +121,22 @@ export default function GiftReceivedForm() {
                 {contactTypes.map(t => <option value={String(t.id)} key={t.id}>{t.name}</option>)}
               </select>
             </FormField>
-            <FormField label="金额">
-              <input type="number" name="amount" value={form.amount} onChange={handleChange}
-                className="input-field" placeholder="请输入金额" min="0.01" step="0.01" />
-            </FormField>
-            <FormField label="所属礼簿">
+            <FormField label="礼簿">
               <select name="gift_book_id" value={form.gift_book_id} onChange={handleChange} className="select-field">
                 <option value="">请选择礼簿</option>
                 {giftBooks.map(b => <option value={String(b.id)} key={b.id}>{b.name} ({b.date?.slice(0, 10)})</option>)}
               </select>
+            </FormField>
+            <FormField label="日期">
+              <input type="date" name="gift_date" value={form.gift_date || ''} onChange={handleChange} className="input-field" />
+            </FormField>
+            <FormField label="金额">
+              <input type="number" name="amount" value={form.amount} onChange={handleChange}
+                className="input-field" placeholder="请输入金额" min="0.01" step="0.01" />
+            </FormField>
+            <FormField label="参宴人数">
+              <input type="number" name="guests" value={form.guests} onChange={handleChange}
+                className="input-field" placeholder="请输入参宴人数" min="0" step="1" />
             </FormField>
             <FormField label="备注">
               <textarea name="notes" value={form.notes} onChange={handleChange} className="input-field" rows={3} placeholder="可选备注" />

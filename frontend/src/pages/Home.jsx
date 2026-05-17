@@ -46,7 +46,7 @@ export default function Home() {
           {[
             { label: '收礼总额', value: summary?.totalReceived || 0 },
             { label: '随礼总额', value: summary?.totalGiven || 0 },
-            { label: '净额', value: net, prefix: net >= 0 ? '+' : '' },
+            { label: net > 0 ? '我差别人礼' : net < 0 ? '别人差我礼' : '收支平衡', value: Math.abs(net), prefix: '' },
           ].map(({ label, value, prefix }) => (
             <div key={label} className="bg-white/15 rounded-xl p-3 text-center backdrop-blur-sm">
               <div className="text-xs text-white/80 mb-1">{label}</div>

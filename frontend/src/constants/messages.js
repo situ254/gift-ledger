@@ -66,13 +66,13 @@ export const MSG = {
   VALID_FILE_REQUIRED: '请选择文件',
 };
 
-/** 颜色主题映射 */
+/** 颜色主题映射（新中式奢华配色） */
 export const THEME_COLORS = {
-  GIVEN: 'purple',     // 随礼 = 紫色
-  RECEIVED: 'blue',   // 收礼 = 蓝色
-  POSITIVE: 'green',  // 正值/盈余 = 绿色
-  NEGATIVE: 'red',    // 负值/欠礼 = 红色
-  PRIMARY: 'primary', // 主色
+  GIVEN:   'red',      // 送礼 = 深红
+  RECEIVED: 'gold',    // 收礼 = 奢华金
+  POSITIVE: 'green',   // 正值/盈余 = 绿色
+  NEGATIVE: 'deficit', // 赤字/欠礼 = 深红赤字
+  PRIMARY:  'primary',  // 主色 = 深红
 };
 
 /** 默认日期 */

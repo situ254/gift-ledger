@@ -42,7 +42,7 @@ function Layout() {
   const location = useLocation();
   const showNav = !noLayoutPaths.some(p => location.pathname.startsWith(p));
   return (
-    <div className="max-w-lg mx-auto min-h-screen bg-gray-50 dark:bg-gray-900 relative">
+    <div className="max-w-lg mx-auto min-h-screen bg-ricewhite dark:bg-ink-900 relative">
       <Suspense fallback={<LoadingSpinner />}>
         <Outlet />
       </Suspense>

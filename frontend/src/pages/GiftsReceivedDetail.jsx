@@ -63,8 +63,8 @@ export default function GiftsReceivedDetail() {
       <PageHeader title={`${year}年收礼明细`} variant="rounded"
         backOnClick={() => navigate(ROUTES.RECEIVED.LIST)} />
       <div className="page-container -mt-4">
-        <FilterPills tabs={filterTabs} active={activeReason} onChange={setActiveReason} activeColor="blue" />
-        <SummaryBar count={filtered.length} amount={`共: ${formatCurrency(totalAmount)}`} amountColor="text-blue-500" />
+        <FilterPills tabs={filterTabs} active={activeReason} onChange={setActiveReason} activeColor="gold" />
+        <SummaryBar count={filtered.length} amount={`共: ${formatCurrency(totalAmount)}`} amountColor="amount-received" />
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">暂无收礼记录</div>
         ) : (
@@ -76,14 +76,14 @@ export default function GiftsReceivedDetail() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-800 dark:text-white truncate">{g.contact_name}</span>
-                    {g.contact_type_name && <span className="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-1.5 py-0.5 rounded">{g.contact_type_name}</span>}
+                    {g.contact_type_name && <span className="inline-block bg-gold-50 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 text-xs px-1.5 py-0.5 rounded">{g.contact_type_name}</span>}
                   </div>
                   <div className="text-xs text-gray-400">
                     {g.gift_book_name && <span>{g.gift_book_name}</span>}
                     <span className="ml-2">{monthDay(g.gift_book_date)}</span>
                   </div>
                 </div>
-                <span className="font-bold text-blue-500 ml-3">{formatCurrency(g.amount)}</span>
+                <span className="font-bold amount-received ml-3">{formatCurrency(g.amount)}</span>
               </div>
             ))}
           </div>

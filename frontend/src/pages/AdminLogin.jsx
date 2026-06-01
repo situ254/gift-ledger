@@ -26,7 +26,7 @@ export default function AdminLogin() {
   }, [username, password, login, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-ricewhite dark:bg-ink-900 p-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold text-center mb-8 text-red-500">管理员登录</h1>
         <div className="card">

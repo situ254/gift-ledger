@@ -40,18 +40,19 @@ export default function Query() {
     byContactTypeReceived = [], byReason = [], byContactType = [],
     availableYears = [] } = data || {};
 
+  // 新中式配色：收礼=gold，送礼=red
   const statsSections = useMemo(() => {
     if (subFilter === 'reason') {
       return [
-        ...(byReason.length > 0 ? [{ title: '按事由统计', items: byReason, color: 'purple' }] : []),
-        ...(byReasonReceived.length > 0 ? [{ title: '收礼·按事由', items: byReasonReceived, color: 'blue' }] : []),
-        ...(byReasonGiven.length > 0 ? [{ title: '随礼·按事由', items: byReasonGiven, color: 'purple' }] : []),
+        ...(byReason.length > 0 ? [{ title: '按事由统计', items: byReason, color: 'primary' }] : []),
+        ...(byReasonReceived.length > 0 ? [{ title: '收礼·按事由', items: byReasonReceived, color: 'gold' }] : []),
+        ...(byReasonGiven.length > 0 ? [{ title: '随礼·按事由', items: byReasonGiven, color: 'red' }] : []),
       ];
     }
     return [
-      ...(byContactType.length > 0 ? [{ title: '按亲友类型统计', items: byContactType, color: 'blue' }] : []),
-      ...(byContactTypeReceived.length > 0 ? [{ title: '收礼·按类型', items: byContactTypeReceived, color: 'blue' }] : []),
-      ...(byContactTypeGiven.length > 0 ? [{ title: '随礼·按类型', items: byContactTypeGiven, color: 'purple' }] : []),
+      ...(byContactType.length > 0 ? [{ title: '按亲友类型统计', items: byContactType, color: 'primary' }] : []),
+      ...(byContactTypeReceived.length > 0 ? [{ title: '收礼·按类型', items: byContactTypeReceived, color: 'gold' }] : []),
+      ...(byContactTypeGiven.length > 0 ? [{ title: '随礼·按类型', items: byContactTypeGiven, color: 'red' }] : []),
     ];
   }, [subFilter, byReason, byContactType, byReasonReceived, byReasonGiven, byContactTypeReceived, byContactTypeGiven]);
 
@@ -75,14 +76,14 @@ export default function Query() {
         {activeTab === 'summary' && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div className="card text-center !p-4">
+              <div className="card text-center !p-4" style={{ background: 'linear-gradient(135deg, #FFFDE7 0%, #FFF8E1 100%)' }}>
                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">收礼</div>
-                <div className="text-2xl font-bold text-blue-500">{formatCurrency(totalReceived)}</div>
+                <div className="text-2xl font-bold amount-received">{formatCurrency(totalReceived)}</div>
                 <div className="text-xs text-gray-400 mt-1">{receivedCount}笔</div>
               </div>
-              <div className="card text-center !p-4">
+              <div className="card text-center !p-4" style={{ background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)' }}>
                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">随礼</div>
-                <div className="text-2xl font-bold text-purple-500">{formatCurrency(totalGiven)}</div>
+                <div className="text-2xl font-bold amount-given">{formatCurrency(totalGiven)}</div>
                 <div className="text-xs text-gray-400 mt-1">{givenCount}笔</div>
               </div>
             </div>
@@ -103,7 +104,9 @@ export default function Query() {
                         <span className={`badge badge-${section.color}`}>{item.name || '其它'}</span>
                         <span className="text-xs text-gray-400">{item.count}笔</span>
                       </div>
-                      <span className={`font-bold text-${section.color}-500`}>{formatCurrency(item.total)}</span>
+                      <span className={`font-bold ${section.color === 'gold' ? 'amount-received' : section.color === 'red' ? 'amount-given' : 'text-primary-500'}`}>
+                        {formatCurrency(item.total)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -137,7 +140,7 @@ export default function Query() {
             ) : oweMe.map((item, idx) => (
                 <div key={idx} className="card flex items-center justify-between">
                   <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
-                  <span className="font-bold text-red-500">{formatCurrency(Math.abs(item.net))}</span>
+                  <span className="font-bold amount-given">{formatCurrency(Math.abs(item.net))}</span>
                 </div>
               ))
             }

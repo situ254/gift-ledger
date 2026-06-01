@@ -84,13 +84,13 @@ export default function GiftsGiven() {
               {reasonEntries.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar mb-2">
                   {reasonEntries.map(([name, count]) => (
-                    <span key={name} className="whitespace-nowrap inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{name}：{count}</span>
+                    <span key={name} className="whitespace-nowrap inline-flex items-center gap-1 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{name}：{count}</span>
                   ))}
                 </div>
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">共{stats.count}笔</span>
-                <span className="font-bold text-purple-500">总金额: {formatCurrency(stats.totalAmount)}</span>
+                <span className="font-bold amount-given">总金额: {formatCurrency(stats.totalAmount)}</span>
               </div>
             </CardItem>
           );

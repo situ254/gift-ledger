@@ -62,8 +62,8 @@ export default function GiftsGivenDetail() {
       <PageHeader title={`${year}年随礼明细`} variant="rounded"
         backOnClick={() => navigate(ROUTES.GIVEN.LIST)} />
       <div className="page-container -mt-4">
-        <FilterPills tabs={filterTabs} active={activeReason} onChange={setActiveReason} activeColor="purple" />
-        <SummaryBar count={filtered.length} amount={`共: ${formatCurrency(totalAmount)}`} amountColor="text-purple-500" />
+        <FilterPills tabs={filterTabs} active={activeReason} onChange={setActiveReason} activeColor="red" />
+        <SummaryBar count={filtered.length} amount={`共: ${formatCurrency(totalAmount)}`} amountColor="amount-given" />
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">暂无随礼记录</div>
         ) : (
@@ -75,11 +75,11 @@ export default function GiftsGivenDetail() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-800 dark:text-white truncate">{g.contact_name}</span>
-                    {g.reason_name && <span className="inline-block bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs px-1.5 py-0.5 rounded">{g.reason_name}</span>}
+                    {g.reason_name && <span className="inline-block bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs px-1.5 py-0.5 rounded">{g.reason_name}</span>}
                   </div>
                   <div className="text-xs text-gray-400">{monthDay(g.gift_date)}</div>
                 </div>
-                <span className="font-bold text-purple-500 ml-3">{formatCurrency(g.amount)}</span>
+                <span className="font-bold amount-given ml-3">{formatCurrency(g.amount)}</span>
               </div>
             ))}
           </div>

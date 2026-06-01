@@ -1,17 +1,74 @@
 @import "tailwindcss";
+
+/* ============================================================
+   人情记账 · 新中式奢华配色体系
+   参考：final00000000/Gift_Ledger Flutter 版本
+   ============================================================ */
+
 @theme {
-  --color-primary-50: #E0F2F1;
-  --color-primary-100: #B2DFDB;
-  --color-primary-200: #80CBC4;
-  --color-primary-300: #4DB6AC;
-  --color-primary-400: #26A69A;
-  --color-primary-500: #009688;
-  --color-primary-600: #00897B;
-  --color-primary-700: #00796B;
-  --color-primary-800: #00695C;
-  --color-primary-900: #004D40;
+  /* ---- 主色系：深红 / 朱红（送礼）---- */
+  --color-primary-50:  #FFEBEE;
+  --color-primary-100: #FFCDD2;
+  --color-primary-200: #EF9A9A;
+  --color-primary-300: #E57373;
+  --color-primary-400: #EF5350;
+  --color-primary-500: #C62828;   /* 主红 800 */
+  --color-primary-600: #B71C1C;
+  --color-primary-700: #A31515;
+  --color-primary-800: #8B1538;   /* 酒红 */
+  --color-primary-900: #5D0A1F;
+
+  /* ---- 奢华金系（收礼）---- */
+  --color-gold-50:  #FFFDE7;
+  --color-gold-100: #FFF9C4;
+  --color-gold-200: #FFECB3;
+  --color-gold-300: #FFE082;
+  --color-gold-400: #FFD54F;
+  --color-gold-500: #D4AF37;   /* 奢华金 */
+  --color-gold-600: #C49A48;   /* 香槟金 */
+  --color-gold-700: #B76E79;   /* 玫瑰金 */
+  --color-gold-800: #8B6914;
+  --color-gold-900: #5D4808;
+
+  /* ---- 水墨中性色 ---- */
+  --color-ink-50:  #F8F8F8;
+  --color-ink-100: #E8E8E8;
+  --color-ink-200: #D5D5D5;
+  --color-ink-300: #B0B0B0;
+  --color-ink-400: #808080;
+  --color-ink-500: #5D5D5D;
+  --color-ink-600: #4A4A4A;
+  --color-ink-700: #2D2D2D;   /* 炭灰 */
+  --color-ink-800: #1F1F1F;
+  --color-ink-900: #1A1A1A;   /* 墨黑 */
+
+  --color-ricewhite:     #FAF8F5;
+  --color-parchment:    #F5F0E8;
 }
 
+/* ============================================================
+   玻璃态 / Glassmorphism 工具类
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.dark .glass {
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.glass-gold {
+  background: rgba(212, 175, 55, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* ============================================================
+   页头：支持渐变
+   ============================================================ */
 .page-header {
   position: sticky;
   top: 0;
@@ -19,7 +76,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: var(--color-primary-500);
+  background: linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
   padding-inline: 1rem;
   padding-block: 0.75rem;
   color: var(--color-white);
@@ -29,13 +86,16 @@
 .page-header-rounded {
   border-bottom-right-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
-  background-color: var(--color-primary-500);
+  background: linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
   padding-inline: 1rem;
   padding-top: 1rem;
   padding-bottom: 2rem;
   color: var(--color-white);
 }
 
+/* ============================================================
+   页面容器
+   ============================================================ */
 .page-container {
   padding-inline: 1rem;
   padding-block: 0.75rem;
@@ -44,17 +104,24 @@
   overflow-y: auto;
 }
 
+/* ============================================================
+   按钮
+   ============================================================ */
 .btn-primary {
   border-radius: 0.5rem;
-  background-color: var(--color-primary-500);
+  background: linear-gradient(135deg, #C62828 0%, #8B1538 100%);
   padding-inline: 1rem;
   padding-block: 0.5rem;
   font-weight: 500;
   color: var(--color-white);
   transition: color, background-color, border-color;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.3);
 }
-.btn-primary:hover { background-color: var(--color-primary-600); }
+.btn-primary:hover {
+  background: linear-gradient(135deg, #B71C1C 0%, #7A1230 100%);
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
+}
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-outline {
@@ -65,9 +132,17 @@
   font-weight: 500;
   color: var(--color-primary-500);
   cursor: pointer;
+  transition: all 0.2s;
 }
-.btn-outline:hover { background-color: var(--color-primary-500); color: var(--color-white); }
+.btn-outline:hover {
+  background: linear-gradient(135deg, #C62828 0%, #8B1538 100%);
+  color: var(--color-white);
+  border-color: transparent;
+}
 
+/* ============================================================
+   输入框 / 选择框
+   ============================================================ */
 .input-field {
   border-radius: 0.5rem;
   border: 1px solid var(--color-gray-300);
@@ -80,7 +155,7 @@
 .input-field:focus {
   outline: none;
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.2);
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
 }
 .dark .input-field {
   border-color: var(--color-gray-600);
@@ -100,7 +175,7 @@
 .select-field:focus {
   outline: none;
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.2);
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
 }
 .dark .select-field {
   border-color: var(--color-gray-600);
@@ -108,18 +183,49 @@
   color: var(--color-white);
 }
 
+/* ============================================================
+   卡片
+   ============================================================ */
 .card {
   border-radius: 0.75rem;
   border: 1px solid var(--color-gray-100);
   background-color: var(--color-white);
   padding: 1rem;
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .dark .card {
   border-color: var(--color-gray-700);
   background-color: var(--color-gray-800);
 }
 
+/* 玻璃态卡片变体 */
+.card-glass {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.08);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.dark .card-glass {
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.card-glass:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   Badge 语义色系（新中式）
+   ============================================================ */
 .badge {
   padding: 0.125rem 0.5rem;
   font-size: 0.75rem;
@@ -127,46 +233,96 @@
   border-radius: 0.25rem;
   display: inline-block;
 }
+
+/* 主色 badage */
 .badge-primary {
   background-color: var(--color-primary-50);
   color: var(--color-primary-600);
 }
 .dark .badge-primary {
-  background-color: rgba(0, 150, 136, 0.2);
-  color: #80CBC4;
+  background-color: rgba(198, 40, 40, 0.2);
+  color: var(--color-primary-100);
 }
-.badge-blue {
-  background-color: #EFF6FF;
-  color: #2563EB;
+
+/* 送礼（深红）*/
+.badge-red {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
 }
-.dark .badge-blue {
-  background-color: rgba(30, 64, 175, 0.3);
-  color: #93C5FD;
+.dark .badge-red {
+  background-color: rgba(198, 40, 40, 0.2);
+  color: var(--color-primary-100);
 }
-.badge-orange {
-  background-color: #FFF7ED;
-  color: #EA580C;
+
+/* 收礼（奢华金）*/
+.badge-gold {
+  background-color: var(--color-gold-50);
+  color: var(--color-gold-600);
 }
-.dark .badge-orange {
-  background-color: rgba(154, 52, 18, 0.3);
-  color: #FDBA74;
+.dark .badge-gold {
+  background-color: rgba(212, 175, 55, 0.2);
+  color: var(--color-gold-300);
 }
-.badge-purple {
-  background-color: #FAF5FF;
-  color: #9333EA;
+
+/* 盈余（绿色）— 保持不变 */
+.badge-green {
+  background-color: #F0FDF4;
+  color: #15803D;
 }
-.dark .badge-purple {
-  background-color: rgba(107, 33, 168, 0.3);
-  color: #C084FC;
+.dark .badge-green {
+  background-color: rgba(21, 128, 61, 0.2);
+  color: #86EFAC;
 }
+
+/* 赤字（深红）— 与送礼同色系 */
+.badge-deficit {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+}
+.dark .badge-deficit {
+  background-color: rgba(198, 40, 40, 0.2);
+  color: var(--color-primary-100);
+}
+
+/* 灰色 badage */
 .badge-gray {
-  background-color: #F9FAFB;
-  color: #4B5563;
+  background-color: var(--color-ink-50);
+  color: var(--color-ink-600);
 }
 .dark .badge-gray {
   background-color: rgba(55, 65, 81, 1);
-  color: #D1D5DB;
+  color: var(--color-ink-200);
 }
 
+/* ============================================================
+   金额显示
+   ============================================================ */
+.amount-given {   /* 送礼金额：深红 */
+  color: var(--color-primary-500);
+  font-weight: 600;
+}
+.dark .amount-given { color: var(--color-primary-300); }
+
+.amount-received { /* 收礼金额：奢华金 */
+  color: var(--color-gold-500);
+  font-weight: 600;
+}
+.dark .amount-received { color: var(--color-gold-300); }
+
+/* ============================================================
+   全局背景
+   ============================================================ */
+body {
+  background-color: var(--color-ricewhite);
+  color: var(--color-ink-900);
+}
+.dark body {
+  background-color: var(--color-ink-900);
+  color: var(--color-ink-100);
+}
+
+/* ============================================================
+   滚动条隐藏
+   ============================================================ */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

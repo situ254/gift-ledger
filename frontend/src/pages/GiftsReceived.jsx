@@ -64,7 +64,7 @@ export default function GiftsReceived() {
                   <div className="text-lg font-bold text-gray-800 dark:text-white mb-2">{year}年</div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">共{stats.count}笔</span>
-                    <span className="font-bold text-blue-500">总金额: {formatCurrency(stats.totalAmount)}</span>
+                    <span className="font-bold amount-received">总金额: {formatCurrency(stats.totalAmount)}</span>
                   </div>
                 </CardItem>
               );

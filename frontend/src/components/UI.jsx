@@ -70,9 +70,9 @@ export const EmptyState = memo(function EmptyState({ emoji, text, actionLabel, o
 export const FilterPills = memo(function FilterPills({ tabs, active, onChange, activeColor = 'primary' }) {
   const colorMap = {
     primary: 'bg-primary-500',
-    purple: 'bg-purple-500',
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
+    gold:    'bg-gold-500',
+    green:   'bg-green-500',
+    red:     'bg-primary-500',
   };
   const activeBg = colorMap[activeColor] || colorMap.primary;
 
@@ -122,14 +122,14 @@ export const FormField = memo(function FormField({ label, children }) {
 });
 
 /**
- * 可点击卡片项
+ * 可点击卡片项 - 新增 glass 变体
  */
-export const CardItem = memo(function CardItem({ onClick, children, className = '' }) {
+export const CardItem = memo(function CardItem({ onClick, children, className = '', glass = false }) {
+  const baseCls = glass
+    ? 'card-glass cursor-pointer active:scale-[0.98] transition-transform'
+    : 'bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm cursor-pointer active:scale-[0.98] transition-transform';
   return (
-    <div
-      onClick={onClick}
-      className={`bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm cursor-pointer active:scale-[0.98] transition-transform ${className}`}
-    >
+    <div onClick={onClick} className={`${baseCls} ${className}`}>
       {children}
     </div>
   );

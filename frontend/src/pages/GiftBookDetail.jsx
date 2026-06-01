@@ -81,7 +81,7 @@ export default function GiftBookDetail() {
                   </div>
                   <div className="text-xs text-gray-400">{monthDay(g.gift_book_date)}</div>
                 </div>
-                <span className="font-bold text-blue-500 ml-3">{formatCurrency(g.amount)}</span>
+                <span className="font-bold amount-received ml-3">{formatCurrency(g.amount)}</span>
               </div>
             ))}
           </div>

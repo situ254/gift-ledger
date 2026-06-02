@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { giftBooksApi, giftsReceivedApi } from '../api';
 import { formatCurrency, shortenDate, lunarDate } from '../utils/helpers';
-import { LoadingSpinner, PageHeader, EmptyState, CardItem } from '../components/UI';
+import { LoadingSpinner, PageHeader, YearSelector, EmptyState, CardItem } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';

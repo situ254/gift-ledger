@@ -27,7 +27,7 @@ export default function ExportPage() {
       <PageHeader title="数据导出" variant="flat" backOnClick={() => navigate(ROUTES.PROFILE)} />
       <div className="page-container">
         <div className="card">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">将所有数据导出为Excel文件</p>
+          <p className="text-gray-600 mb-4">将所有数据导出为Excel文件</p>
           <button onClick={handleExport} disabled={exporting} className="btn-primary w-full py-3">{exporting ? '导出中...' : '导出数据'}</button>
         </div>
       </div>

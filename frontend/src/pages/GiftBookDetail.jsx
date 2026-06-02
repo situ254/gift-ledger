@@ -55,29 +55,29 @@ export default function GiftBookDetail() {
         backOnClick={() => navigate(ROUTES.GIFT_BOOKS.LIST)} />
       <div className="page-container -mt-4">
         <FilterPills tabs={filterTabs} active={activeType} onChange={setActiveType} activeColor="primary" />
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-3 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white rounded-xl p-3 mb-3 border border-gray-100 shadow-sm">
           <div className="flex flex-wrap gap-3">
             {Object.entries(typeGroups).map(([name, data]) => (
               <AmountBadge key={name} label={name} count={data.count} amount={formatCurrency(data.amount)} />
             ))}
           </div>
-          <div className="mt-2 pt-2 border-t border-gray-50 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-            共 <strong className="text-gray-700 dark:text-gray-200">{receivedGifts.length}</strong> 笔
+          <div className="mt-2 pt-2 border-t border-gray-50 text-xs text-gray-500">
+            共 <strong className="text-gray-700">{receivedGifts.length}</strong> 笔
           </div>
         </div>
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">暂无收礼记录</div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {filtered.map((g, idx) => (
               <div key={g.id}
                 onClick={() => navigate(ROUTES.RECEIVED.EDIT(g.id))}
-                className={`flex items-center px-4 py-3 cursor-pointer active:bg-gray-50 dark:active:bg-gray-700 transition-colors ${idx < filtered.length - 1 ? 'border-b border-gray-50 dark:border-gray-700' : ''}`}>
-                <span className="text-gray-300 dark:text-gray-600 text-xs w-8 text-right mr-3">{filtered.length - idx}</span>
+                className={`flex items-center px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${idx < filtered.length - 1 ? 'border-b border-gray-50' : ''}`}>
+                <span className="text-gray-300 text-xs w-8 text-right mr-3">{filtered.length - idx}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800 dark:text-white truncate">{g.contact_name}</span>
-                    {g.contact_type_name && <span className="inline-block bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs px-1.5 py-0.5 rounded">{g.contact_type_name}</span>}
+                    <span className="font-medium text-gray-800 truncate">{g.contact_name}</span>
+                    {g.contact_type_name && <span className="inline-block bg-primary-50 text-primary-600 text-xs px-1.5 py-0.5 rounded">{g.contact_type_name}</span>}
                   </div>
                   <div className="text-xs text-gray-400">{monthDay(g.gift_book_date)}</div>
                 </div>

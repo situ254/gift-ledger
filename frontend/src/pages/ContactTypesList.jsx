@@ -34,7 +34,7 @@ export default function ContactTypesList() {
         <div className="space-y-2">
           {types.map(t => (
             <div key={t.id} className="card flex items-center justify-between">
-              <span className="font-medium text-gray-800 dark:text-white">{t.name}</span>
+              <span className="font-medium text-gray-800">{t.name}</span>
               <div className="flex gap-2">
                 <button onClick={() => navigate(ROUTES.CONTACT_TYPES.EDIT(t.id))} className="text-sm text-primary-500 hover:underline">编辑</button>
                 <button onClick={() => handleDelete(t.id)} className="text-sm text-red-500 hover:underline">删除</button>

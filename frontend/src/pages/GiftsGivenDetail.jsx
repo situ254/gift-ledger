@@ -67,15 +67,15 @@ export default function GiftsGivenDetail() {
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">暂无随礼记录</div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {filtered.map((g, idx) => (
               <div key={g.id}
                 onClick={() => navigate(ROUTES.GIVEN.EDIT(g.id))}
-                className={`flex items-center px-4 py-3 cursor-pointer active:bg-gray-50 dark:active:bg-gray-700 transition-colors ${idx < filtered.length - 1 ? 'border-b border-gray-50 dark:border-gray-700' : ''}`}>
+                className={`flex items-center px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${idx < filtered.length - 1 ? 'border-b border-gray-50' : ''}`}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800 dark:text-white truncate">{g.contact_name}</span>
-                    {g.reason_name && <span className="inline-block bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs px-1.5 py-0.5 rounded">{g.reason_name}</span>}
+                    <span className="font-medium text-gray-800 truncate">{g.contact_name}</span>
+                    {g.reason_name && <span className="inline-block bg-red-50 text-red-600 text-xs px-1.5 py-0.5 rounded">{g.reason_name}</span>}
                   </div>
                   <div className="text-xs text-gray-400">{monthDay(g.gift_date)}</div>
                 </div>

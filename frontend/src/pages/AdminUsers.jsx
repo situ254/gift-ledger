@@ -41,7 +41,7 @@ export default function AdminUsers() {
         {users.map(u => (
           <div key={u.id} className="card flex items-center justify-between">
             <div>
-              <div className="font-medium text-gray-800 dark:text-white">{u.username}</div>
+              <div className="font-medium text-gray-800">{u.username}</div>
               <div className="text-xs text-gray-400">{u.role === 'admin' ? '管理员' : '普通用户'}</div>
             </div>
             <div className="flex gap-2 items-center">

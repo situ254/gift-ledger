@@ -61,9 +61,9 @@ export default function GiftsReceived() {
               const stats = yearStats[year];
               return (
                 <CardItem key={year} onClick={() => navigate(ROUTES.RECEIVED.YEAR(year))} className="!p-4">
-                  <div className="text-lg font-bold text-gray-800 dark:text-white mb-2">{year}年</div>
+                  <div className="text-lg font-bold text-gray-800 mb-2">{year}年</div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">共{stats.count}笔</span>
+                    <span className="text-sm text-gray-500">共{stats.count}笔</span>
                     <span className="font-bold amount-received">总金额: {formatCurrency(stats.totalAmount)}</span>
                   </div>
                 </CardItem>

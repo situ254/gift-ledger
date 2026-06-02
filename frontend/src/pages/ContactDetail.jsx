@@ -56,11 +56,11 @@ export default function ContactDetail() {
       </PageHeader>
 
       {showMenu && (
-        <div className="absolute right-4 top-16 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 w-32">
+        <div className="absolute right-4 top-16 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-32">
           <button onClick={() => { setShowMenu(false); navigate(ROUTES.GIVEN.NEW); }}
-            className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">添加随礼</button>
+            className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm">添加随礼</button>
           <button onClick={() => { setShowMenu(false); navigate(ROUTES.RECEIVED.NEW); }}
-            className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">添加收礼</button>
+            className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm">添加收礼</button>
           <button onClick={() => { setShowMenu(false); handleDeleteContact(); }}
             className="w-full text-left px-4 py-3 text-red-500 hover:bg-red-50 text-sm">删除好友</button>
         </div>
@@ -70,11 +70,11 @@ export default function ContactDetail() {
         {/* 收礼/随礼切换标签 - 新中式配色 */}
         <div className="flex gap-2 mb-3">
           <button onClick={() => setActiveTab('received')}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'received' ? 'bg-gold-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'received' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-600'}`}>
             收礼（{received_records.length}）
           </button>
           <button onClick={() => setActiveTab('given')}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'given' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'given' ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'}`}>
             随礼（{given_records.length}）
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function ContactDetail() {
             </div>
           ) : records.map(r => (
             <div key={r.id}
-              className={`bg-white dark:bg-gray-800 rounded-lg p-4 border-l-4 shadow-sm ${activeTab === 'received' ? 'border-gold-500' : 'border-primary-500'}`}
+              className={`bg-white rounded-lg p-4 border-l-4 shadow-sm ${activeTab === 'received' ? 'border-gold-500' : 'border-primary-500'}`}
               onClick={() => {
                 if (activeTab === 'received') navigate(ROUTES.RECEIVED.EDIT(r.id));
                 else navigate(ROUTES.GIVEN.EDIT(r.id));
@@ -95,7 +95,7 @@ export default function ContactDetail() {
               <div className={`font-medium text-lg mb-2 ${activeTab === 'received' ? 'text-gold-600' : 'text-primary-600'}`}>
                 {r.contact_name || decodedName}
               </div>
-              <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
+              <div className="space-y-1 text-sm text-gray-500">
                 {activeTab === 'received' ? (
                   <>
                     {r.gift_book_name && <div>礼簿：{r.gift_book_name}</div>}
@@ -121,27 +121,27 @@ export default function ContactDetail() {
         </div>
 
         {/* 底部统计信息 */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
           <div className="grid grid-cols-2 gap-4 mb-3">
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">收礼总次数</div>
+              <div className="text-xs text-gray-500">收礼总次数</div>
               <div className="font-bold amount-received text-lg">{received_records.length}<span className="text-xs font-normal">次</span></div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">收礼总金额</div>
+              <div className="text-xs text-gray-500">收礼总金额</div>
               <div className="font-bold amount-received text-lg">{formatCurrency(total_received)}<span className="text-xs font-normal">元</span></div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">随礼总次数</div>
+              <div className="text-xs text-gray-500">随礼总次数</div>
               <div className="font-bold amount-given text-lg">{given_records.length}<span className="text-xs font-normal">次</span></div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">随礼总金额</div>
+              <div className="text-xs text-gray-500">随礼总金额</div>
               <div className="font-bold amount-given text-lg">{formatCurrency(total_given)}<span className="text-xs font-normal">元</span></div>
             </div>
           </div>
-          <div className="border-t border-gray-100 dark:border-gray-700 pt-3 text-center">
-            <div className="text-xs text-gray-500 dark:text-gray-400">人情往来差额</div>
+          <div className="border-t border-gray-100 pt-3 text-center">
+            <div className="text-xs text-gray-500">人情往来差额</div>
             <div className={`font-bold text-lg ${balanceColor}`}>{balanceLabel}</div>
           </div>
         </div>

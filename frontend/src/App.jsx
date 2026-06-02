@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import { LoadingSpinner } from './components/UI';
 import * as Pages from './components/RoutePages';
@@ -24,11 +23,11 @@ function BottomNav() {
   const isActive = (path) => path === ROUTES.HOME ? location.pathname === ROUTES.HOME : location.pathname.startsWith(path);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
       <div className="max-w-lg mx-auto flex justify-around items-center h-14">
         {tabs.map(tab => (
           <button key={tab.path} onClick={() => navigate(tab.path)}
-            className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${isActive(tab.path) ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600'}`}>
+            className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${isActive(tab.path) ? 'text-primary-500' : 'text-gray-400 hover:text-gray-600'}`}>
             <span className={isActive(tab.path) ? 'text-primary-500' : ''}>{tab.icon}</span>
             <span className="text-xs mt-0.5 font-medium">{tab.label}</span>
           </button>
@@ -42,7 +41,7 @@ function Layout() {
   const location = useLocation();
   const showNav = !noLayoutPaths.some(p => location.pathname.startsWith(p));
   return (
-    <div className="max-w-lg mx-auto min-h-screen bg-ricewhite dark:bg-ink-900 relative">
+    <div className="max-w-lg mx-auto min-h-screen bg-ricewhite relative">
       <Suspense fallback={<LoadingSpinner />}>
         <Outlet />
       </Suspense>
@@ -67,9 +66,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ThemeProvider>
-          <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
-          <Suspense fallback={<LoadingSpinner />}>
+        <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+        <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               <Route path={ROUTES.LOGIN} element={<Pages.Login />} />
               <Route path={ROUTES.REGISTER} element={<Pages.Register />} />
@@ -109,7 +107,6 @@ export default function App() {
               <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
             </Routes>
           </Suspense>
-        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -26,9 +26,9 @@ export default function AdminSystem() {
       <div className="page-container">
         <div className="card">
           {info && Object.entries(info).map(([key, value]) => (
-            <div key={key} className="flex justify-between py-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
-              <span className="text-gray-500 dark:text-gray-400">{key}</span>
-              <span className="font-medium text-gray-800 dark:text-white">{String(value)}</span>
+            <div key={key} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+              <span className="text-gray-500">{key}</span>
+              <span className="font-medium text-gray-800">{String(value)}</span>
             </div>
           ))}
         </div>

@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { PageHeader } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
@@ -18,7 +17,6 @@ const MENU_ITEMS = [
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
-  const { dark, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     if (window.confirm(MSG.CONFIRM_LOGOUT)) { logout(); navigate(ROUTES.LOGIN); }
@@ -43,37 +41,27 @@ export default function Profile() {
         <div className="space-y-1">
           {MENU_ITEMS.map(item => (
             <button key={item.path} onClick={() => navigate(item.path)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:bg-primary-50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/30 text-primary-500 text-sm">{item.icon}</span>
-                <span className="text-gray-800 dark:text-white">{item.label}</span>
+                <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary-50 text-primary-500 text-sm">{item.icon}</span>
+                <span className="text-gray-800">{item.label}</span>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
             </button>
           ))}
         </div>
 
-        {/* 深色模式切换 */}
-        <div className="card mt-4 flex items-center justify-between">
-          <span className="text-gray-800 dark:text-white">深色模式</span>
-          <button onClick={toggleTheme}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${dark ? 'bg-primary-500' : 'bg-gray-300'}`}
-          >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${dark ? 'translate-x-6' : 'translate-x-1'}`} />
-          </button>
-        </div>
-
         {/* 退出登录 */}
         <button onClick={handleLogout}
-          className="w-full mt-4 py-3 text-red-500 font-medium bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
+          className="w-full mt-4 py-3 text-red-500 font-medium bg-white rounded-xl border border-gray-100 hover:bg-red-50 transition-colors"
         >
           退出登录
         </button>
 
         {isAdmin && (
           <button onClick={() => navigate(ROUTES.ADMIN.USERS)}
-            className="w-full mt-2 py-3 text-primary-500 font-medium bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors"
+            className="w-full mt-2 py-3 text-primary-500 font-medium bg-white rounded-xl border border-gray-100 hover:bg-primary-50 transition-colors"
           >
             管理后台
           </button>

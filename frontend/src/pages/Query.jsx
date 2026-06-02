@@ -77,18 +77,18 @@ export default function Query() {
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="card text-center !p-4" style={{ background: 'linear-gradient(135deg, #FFFDE7 0%, #FFF8E1 100%)' }}>
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">收礼</div>
+                <div className="text-sm text-gray-500 mb-1">收礼</div>
                 <div className="text-2xl font-bold amount-received">{formatCurrency(totalReceived)}</div>
                 <div className="text-xs text-gray-400 mt-1">{receivedCount}笔</div>
               </div>
               <div className="card text-center !p-4" style={{ background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)' }}>
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">随礼</div>
+                <div className="text-sm text-gray-500 mb-1">随礼</div>
                 <div className="text-2xl font-bold amount-given">{formatCurrency(totalGiven)}</div>
                 <div className="text-xs text-gray-400 mt-1">{givenCount}笔</div>
               </div>
             </div>
             <div className="card !p-3 flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">{netAmount > 0 ? '我差别人礼' : netAmount < 0 ? '别人差我礼' : '收支平衡'}</span>
+              <span className="text-sm text-gray-500">{netAmount > 0 ? '我差别人礼' : netAmount < 0 ? '别人差我礼' : '收支平衡'}</span>
               <span className={`font-bold text-lg ${netAmount > 0 ? 'text-green-500' : netAmount < 0 ? 'text-red-500' : 'text-gray-500'}`}>
                 {formatCurrency(Math.abs(netAmount))}
               </span>
@@ -96,7 +96,7 @@ export default function Query() {
             <FilterPills tabs={SUB_TABS} active={subFilter} onChange={setSubFilter} activeColor="primary" />
             {statsSections.map(section => (
               <div key={section.title} className="card">
-                <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-2">{section.title}</h3>
+                <h3 className="font-bold text-gray-700 mb-2">{section.title}</h3>
                 <div className="space-y-2">
                   {section.items.map((item, idx) => (
                     <div key={idx} className="flex items-center justify-between">
@@ -123,7 +123,7 @@ export default function Query() {
               </div>
             ) : iOwe.map((item, idx) => (
                 <div key={idx} className="card flex items-center justify-between">
-                  <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                  <span className="font-medium text-gray-800">{item.contact_name}</span>
                   <span className="font-bold text-green-500">{formatCurrency(Math.abs(item.net))}</span>
                 </div>
               ))
@@ -139,7 +139,7 @@ export default function Query() {
               </div>
             ) : oweMe.map((item, idx) => (
                 <div key={idx} className="card flex items-center justify-between">
-                  <span className="font-medium text-gray-800 dark:text-white">{item.contact_name}</span>
+                  <span className="font-medium text-gray-800">{item.contact_name}</span>
                   <span className="font-bold amount-given">{formatCurrency(Math.abs(item.net))}</span>
                 </div>
               ))

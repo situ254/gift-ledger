@@ -68,20 +68,20 @@ export default function GiftBookList() {
               const typeEntries = Object.entries(s.typeCount).filter(([, c]) => c > 0);
               return (
                 <CardItem key={book.id} onClick={() => navigate(ROUTES.GIFT_BOOKS.DETAIL(book.id))} className="!p-4 glass">
-                  <div className="text-lg font-bold text-gray-800 dark:text-white mb-2">{book.name}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-lg font-bold text-gray-800 mb-2">{book.name}</div>
+                  <div className="text-sm text-gray-500">
                     {shortenDate(book.date)}
                     {book.date && <span className="ml-1 text-gray-400">（{lunarDate(book.date)}）</span>}
                   </div>
                   {typeEntries.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {typeEntries.map(([n, c]) => (
-                        <span key={n} className="inline-flex items-center gap-1 bg-gold-50 dark:bg-gold-900/20 text-gold-600 dark:text-gold-400 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{n}：{c}</span>
+                        <span key={n} className="inline-flex items-center gap-1 bg-gold-50 text-gold-600 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{n}：{c}</span>
                       ))}
                     </div>
                   )}
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-50 dark:border-gray-700">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">💎 共<strong className="text-gray-700 dark:text-gray-200">{s.totalRecords}</strong>笔</span>
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">
+                    <span className="text-sm text-gray-500">💎 共<strong className="text-gray-700">{s.totalRecords}</strong>笔</span>
                     <span className="font-bold amount-received">📈 {formatCurrency(s.totalAmount)}</span>
                   </div>
                 </CardItem>

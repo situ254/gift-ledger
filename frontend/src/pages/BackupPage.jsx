@@ -84,7 +84,7 @@ export default function BackupPage() {
       <PageHeader title="云端备份" variant="flat" backOnClick={() => navigate(ROUTES.PROFILE)} />
       <div className="page-container space-y-4">
         <div className="card space-y-3">
-          <h3 className="font-bold text-gray-700 dark:text-gray-200">WebDAV 配置</h3>
+          <h3 className="font-bold text-gray-700">WebDAV 配置</h3>
           <FormField label="URL"><input type="text" value={webdavConfig.url} onChange={e => setWebdavConfig(c => ({ ...c, url: e.target.value }))} className="input-field" placeholder="https://dav.example.com/path" /></FormField>
           <FormField label="用户名"><input type="text" value={webdavConfig.username} onChange={e => setWebdavConfig(c => ({ ...c, username: e.target.value }))} className="input-field" /></FormField>
           <FormField label="密码"><input type="password" value={webdavConfig.password} onChange={e => setWebdavConfig(c => ({ ...c, password: e.target.value }))} className="input-field" /></FormField>
@@ -98,7 +98,7 @@ export default function BackupPage() {
           </div>
         </div>
         <div className="card space-y-3">
-          <h3 className="font-bold text-gray-700 dark:text-gray-200">本地备份</h3>
+          <h3 className="font-bold text-gray-700">本地备份</h3>
           <button onClick={handleLocalBackup} className="btn-primary w-full py-2">下载备份文件</button>
           <div>
             <input type="file" accept=".json" onChange={handleLocalRestore} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 mb-2" />
@@ -106,7 +106,7 @@ export default function BackupPage() {
           </div>
         </div>
         <div className="card space-y-3">
-          <h3 className="font-bold text-gray-700 dark:text-gray-200">服务器云端</h3>
+          <h3 className="font-bold text-gray-700">服务器云端</h3>
           <div className="flex gap-2">
             <button onClick={handleCloudBackup} className="btn-primary flex-1 py-2">云端备份</button>
             <button onClick={handleCloudRestore} className="btn-outline flex-1 py-2">云端恢复</button>

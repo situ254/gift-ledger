@@ -55,10 +55,6 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-.dark .glass {
-  background: rgba(30, 30, 30, 0.85);
-  border-color: rgba(255, 255, 255, 0.1);
-}
 .glass-gold {
   background: rgba(212, 175, 55, 0.1);
   backdrop-filter: blur(20px);
@@ -157,11 +153,6 @@
   border-color: var(--color-primary-500);
   box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
 }
-.dark .input-field {
-  border-color: var(--color-gray-600);
-  background-color: var(--color-gray-700);
-  color: var(--color-white);
-}
 
 .select-field {
   border-radius: 0.5rem;
@@ -176,11 +167,6 @@
   outline: none;
   border-color: var(--color-primary-500);
   box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
-}
-.dark .select-field {
-  border-color: var(--color-gray-600);
-  background-color: var(--color-gray-700);
-  color: var(--color-white);
 }
 
 /* ============================================================
@@ -198,10 +184,6 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.dark .card {
-  border-color: var(--color-gray-700);
-  background-color: var(--color-gray-800);
-}
 
 /* 玻璃态卡片变体 */
 .card-glass {
@@ -213,10 +195,6 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.08);
   transition: transform 0.15s, box-shadow 0.15s;
-}
-.dark .card-glass {
-  background: rgba(30, 30, 30, 0.85);
-  border-color: rgba(255, 255, 255, 0.1);
 }
 .card-glass:hover {
   transform: translateY(-2px);
@@ -239,19 +217,11 @@
   background-color: var(--color-primary-50);
   color: var(--color-primary-600);
 }
-.dark .badge-primary {
-  background-color: rgba(198, 40, 40, 0.2);
-  color: var(--color-primary-100);
-}
 
 /* 送礼（深红）*/
 .badge-red {
   background-color: var(--color-primary-50);
   color: var(--color-primary-600);
-}
-.dark .badge-red {
-  background-color: rgba(198, 40, 40, 0.2);
-  color: var(--color-primary-100);
 }
 
 /* 收礼（奢华金）*/
@@ -259,19 +229,11 @@
   background-color: var(--color-gold-50);
   color: var(--color-gold-600);
 }
-.dark .badge-gold {
-  background-color: rgba(212, 175, 55, 0.2);
-  color: var(--color-gold-300);
-}
 
 /* 盈余（绿色）— 保持不变 */
 .badge-green {
   background-color: #F0FDF4;
   color: #15803D;
-}
-.dark .badge-green {
-  background-color: rgba(21, 128, 61, 0.2);
-  color: #86EFAC;
 }
 
 /* 赤字（深红）— 与送礼同色系 */
@@ -279,19 +241,11 @@
   background-color: var(--color-primary-50);
   color: var(--color-primary-600);
 }
-.dark .badge-deficit {
-  background-color: rgba(198, 40, 40, 0.2);
-  color: var(--color-primary-100);
-}
 
 /* 灰色 badage */
 .badge-gray {
   background-color: var(--color-ink-50);
   color: var(--color-ink-600);
-}
-.dark .badge-gray {
-  background-color: rgba(55, 65, 81, 1);
-  color: var(--color-ink-200);
 }
 
 /* ============================================================
@@ -301,13 +255,11 @@
   color: var(--color-primary-500);
   font-weight: 600;
 }
-.dark .amount-given { color: var(--color-primary-300); }
 
 .amount-received { /* 收礼金额：奢华金 */
   color: var(--color-gold-500);
   font-weight: 600;
 }
-.dark .amount-received { color: var(--color-gold-300); }
 
 /* ============================================================
    全局背景
@@ -315,10 +267,6 @@
 body {
   background-color: var(--color-ricewhite);
   color: var(--color-ink-900);
-}
-.dark body {
-  background-color: var(--color-ink-900);
-  color: var(--color-ink-100);
 }
 
 /* ============================================================

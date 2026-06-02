@@ -85,7 +85,7 @@ export const FilterPills = memo(function FilterPills({ tabs, active, onChange, a
           className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex-shrink-0 ${
             active === tab.key
               ? `${activeBg} text-white`
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
           {tab.label}
@@ -115,7 +115,7 @@ export const YearSelector = memo(function YearSelector({ years, value, onChange 
 export const FormField = memo(function FormField({ label, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       {children}
     </div>
   );
@@ -127,7 +127,7 @@ export const FormField = memo(function FormField({ label, children }) {
 export const CardItem = memo(function CardItem({ onClick, children, className = '', glass = false }) {
   const baseCls = glass
     ? 'card-glass cursor-pointer active:scale-[0.98] transition-transform'
-    : 'bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm cursor-pointer active:scale-[0.98] transition-transform';
+    : 'bg-white rounded-xl p-3 border border-gray-100 shadow-sm cursor-pointer active:scale-[0.98] transition-transform';
   return (
     <div onClick={onClick} className={`${baseCls} ${className}`}>
       {children}
@@ -140,8 +140,8 @@ export const CardItem = memo(function CardItem({ onClick, children, className = 
  */
 export const SummaryBar = memo(function SummaryBar({ count, amount, amountColor = 'text-primary-500', prefix = '共' }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-3 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between">
-      <span className="text-sm text-gray-500 dark:text-gray-400">{prefix} {count} 笔</span>
+    <div className="bg-white rounded-xl p-3 mb-3 border border-gray-100 shadow-sm flex items-center justify-between">
+      <span className="text-sm text-gray-500">{prefix} {count} 笔</span>
       <span className={`font-bold ${amountColor}`}>{amount}</span>
     </div>
   );
@@ -153,7 +153,7 @@ export const SummaryBar = memo(function SummaryBar({ count, amount, amountColor 
 export const AmountBadge = memo(function AmountBadge({ label, count, amount, color = 'text-primary-500' }) {
   return (
     <div className="flex-1 min-w-[80px]">
-      <div className="text-xs text-gray-500 dark:text-gray-400">{label}{count != null ? `(${count})` : ''}</div>
+      <div className="text-xs text-gray-500">{label}{count != null ? `(${count})` : ''}</div>
       <div className={`font-bold ${color}`}>{amount}</div>
     </div>
   );

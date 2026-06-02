@@ -29,7 +29,7 @@ export default function ContactsList() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-ricewhite dark:bg-ink-900">
+    <div className="min-h-screen bg-ricewhite">
       {/* 头部 - 新中式渐变 */}
       <div className="bg-gradient-to-r from-primary-500 to-primary-800 pt-4 pb-6 px-4 rounded-b-[2rem] text-white">
         <div className="flex items-center justify-between mb-4">
@@ -45,13 +45,13 @@ export default function ContactsList() {
 
       {/* 搜索框 */}
       <div className="px-4 -mt-3">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-4 py-3">
+        <div className="bg-white rounded-lg shadow-sm px-4 py-3">
           <input
             type="text"
             placeholder={`从 ${contacts.length} 位亲友中搜索`}
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-transparent border-b border-gray-200 dark:border-gray-600 pb-2 text-base focus:outline-none focus:border-primary-500 dark:focus:border-primary-400 transition-colors"
+            className="w-full text-gray-800 placeholder-gray-400 bg-transparent border-b border-gray-200 pb-2 text-base focus:outline-none focus:border-primary-500 transition-colors"
           />
         </div>
       </div>
@@ -59,23 +59,23 @@ export default function ContactsList() {
       {/* 列表 */}
       <div className="px-4 mt-2">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+          <div className="text-center py-12 text-gray-400">
             <div className="text-4xl mb-2">👥</div>
             <div>暂无亲友记录</div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {filtered.map((c, idx) => (
               <div
                 key={c.id}
                 onClick={() => navigate(ROUTES.CONTACTS.DETAIL(c.name))}
-                className={`px-4 py-3 cursor-pointer active:bg-gray-50 dark:active:bg-gray-700 transition-colors ${
-                  idx < filtered.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
+                className={`px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${
+                  idx < filtered.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
-                <div className="text-primary-700 dark:text-primary-300 font-medium text-lg">{c.name}</div>
+                <div className="text-primary-700 font-medium text-lg">{c.name}</div>
                 {c.type_name && (
-                  <div className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{c.type_name}</div>
+                  <div className="text-gray-500 text-sm mt-0.5">{c.type_name}</div>
                 )}
               </div>
             ))}

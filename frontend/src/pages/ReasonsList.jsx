@@ -34,7 +34,7 @@ export default function ReasonsList() {
         <div className="space-y-2">
           {reasons.map(r => (
             <div key={r.id} className="card flex items-center justify-between">
-              <span className="font-medium text-gray-800 dark:text-white">{r.name}</span>
+              <span className="font-medium text-gray-800">{r.name}</span>
               <div className="flex gap-2">
                 <button onClick={() => navigate(ROUTES.REASONS.EDIT(r.id))} className="text-sm text-primary-500 hover:underline">编辑</button>
                 <button onClick={() => handleDelete(r.id)} className="text-sm text-red-500 hover:underline">删除</button>

@@ -212,6 +212,8 @@ function waitForMySQL(host, port) {
 let retryCount = 0;
 const MAX_RETRIES = 30;
 
+const { startAutoBackup } = require('./scheduler/autoBackup');
+
 async function start() {
   // 先启动 HTTP 服务
   app.listen(PORT, '0.0.0.0', () => {
@@ -226,6 +228,9 @@ async function start() {
   console.log('MySQL port is reachable, initializing database...');
 
   initDatabase();
+
+  // 启动定时自动备份
+  startAutoBackup();
 }
 
 start();

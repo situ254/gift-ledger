@@ -104,7 +104,7 @@ export default function GiftGivenForm() {
         backOnClick={() => navigate(ROUTES.GIVEN.LIST)}>
         {isEdit && (
           <button onClick={handleDelete} disabled={deleting}
-            className="text-red-500 text-sm font-medium px-3 py-1 border border-red-500 rounded-lg active:scale-95 transition-transform disabled:opacity-50">
+            className="text-red-500 text-sm font-medium px-3 py-1 border border-red-500 rounded-lg active:scale-95 transition-[transform] duration-150 ease-snap disabled:opacity-50">
             {deleting ? '删除中...' : '删除'}
           </button>
         )}

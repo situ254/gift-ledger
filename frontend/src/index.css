@@ -5,7 +5,42 @@
    参考：final00000000/Gift_Ledger Flutter 版本
    ============================================================ */
 
+/* ============================================================
+   全局动画基础设施
+   ============================================================ */
+
+/* GPU 加速：所有可交互元素默认启用合成层 */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;  /* 消除移动端点击高亮 */
+  -webkit-touch-callout: none;               /* 禁止长按弹菜单 */
+}
+
+/* 可交互元素 GPU 合成提示 */
+button, a, [role="button"], .card, .card-glass, .card-glass:hover,
+.btn-primary, .btn-outline, .input-field, .select-field {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 触摸滚动优化 */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ============================================================
+   缓动曲线库
+   ============================================================ */
+/*
+  --ease-out:  弹性回弹，用于出现/展开
+  --ease-in:   平滑收起，用于消失/收起
+  --ease-snap: 快速响应，用于点击反馈（关键优化点）
+*/
 @theme {
+  --ease-snap:  cubic-bezier(0.2, 0, 0, 1);      /* 快出 — 点击反馈 */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);    /* 弹性出 — 展开/弹出 */
+  --ease-in:    cubic-bezier(0.4, 0, 1, 1);        /* 平滑入 — 收起/消失 */
+
   /* ---- 主色系：深红 / 朱红（送礼）---- */
   --color-primary-50:  #FFEBEE;
   --color-primary-100: #FFCDD2;
@@ -110,7 +145,7 @@
   padding-block: 0.5rem;
   font-weight: 500;
   color: var(--color-white);
-  transition: color, background-color, border-color;
+  transition: background 0.15s var(--ease-snap), box-shadow 0.15s var(--ease-snap), transform 0.1s var(--ease-snap);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(198, 40, 40, 0.3);
 }
@@ -118,7 +153,11 @@
   background: linear-gradient(135deg, #B71C1C 0%, #7A1230 100%);
   box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
 }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(198, 40, 40, 0.3);
+}
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .btn-outline {
   border-radius: 0.5rem;
@@ -128,12 +167,15 @@
   font-weight: 500;
   color: var(--color-primary-500);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s var(--ease-snap);
 }
 .btn-outline:hover {
   background: linear-gradient(135deg, #C62828 0%, #8B1538 100%);
   color: var(--color-white);
   border-color: transparent;
+}
+.btn-outline:active {
+  transform: scale(0.97);
 }
 
 /* ============================================================
@@ -147,6 +189,7 @@
   padding-inline: 0.75rem;
   padding-block: 0.5rem;
   color: var(--color-gray-900);
+  transition: border-color 0.15s var(--ease-snap), box-shadow 0.15s var(--ease-snap);
 }
 .input-field:focus {
   outline: none;
@@ -162,6 +205,7 @@
   padding-inline: 0.75rem;
   padding-block: 0.5rem;
   color: var(--color-gray-900);
+  transition: border-color 0.15s var(--ease-snap), box-shadow 0.15s var(--ease-snap);
 }
 .select-field:focus {
   outline: none;
@@ -178,11 +222,15 @@
   background-color: var(--color-white);
   padding: 1rem;
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.2s var(--ease-snap), box-shadow 0.2s var(--ease-snap);
 }
 .card:hover {
-  transform: translateY(-2px);
+  transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
 
 /* 玻璃态卡片变体 */
@@ -194,11 +242,15 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.08);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.2s var(--ease-snap), box-shadow 0.2s var(--ease-snap);
 }
 .card-glass:hover {
-  transform: translateY(-2px);
+  transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.card-glass:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* ============================================================

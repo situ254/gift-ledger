@@ -82,7 +82,7 @@ export const FilterPills = memo(function FilterPills({ tabs, active, onChange, a
         <button
           key={tab.key || 'all'}
           onClick={() => onChange(tab.key)}
-          className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex-shrink-0 ${
+          className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-[background-color,color] duration-150 ease-snap flex-shrink-0 ${
             active === tab.key
               ? `${activeBg} text-white`
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -126,8 +126,8 @@ export const FormField = memo(function FormField({ label, children }) {
  */
 export const CardItem = memo(function CardItem({ onClick, children, className = '', glass = false }) {
   const baseCls = glass
-    ? 'card-glass cursor-pointer active:scale-[0.98] transition-transform'
-    : 'bg-white rounded-xl p-3 border border-gray-100 shadow-sm cursor-pointer active:scale-[0.98] transition-transform';
+    ? 'card-glass cursor-pointer active:scale-[0.97] transition-[transform,box-shadow] duration-200 ease-snap'
+    : 'bg-white rounded-xl p-3 border border-gray-100 shadow-sm cursor-pointer active:scale-[0.97] transition-[transform,box-shadow] duration-200 ease-snap';
   return (
     <div onClick={onClick} className={`${baseCls} ${className}`}>
       {children}

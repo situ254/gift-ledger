@@ -45,6 +45,8 @@ ENV DB_NAME=gift_ledger
 ENV JWT_SECRET=gift_ledger_secret_key_2024
 ENV NODE_ENV=production
 ENV LOG_LEVEL=info
+# 自动备份定时（cron: 分 时 日 月 星期），默认每月1号、16号 22:00（晚上10点）
+ENV AUTO_BACKUP_SCHEDULE=0 22 1,16 * *
 
 # 管理员账号环境变量（用户可覆盖）
 ENV GIFT_LEDGER_ADMIN_USERNAME=admin

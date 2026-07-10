@@ -121,7 +121,8 @@ async function runAutoBackup() {
 
 /**
  * 启动定时自动备份任务
- * 每月 1 号和 16 号凌晨 3 点执行
+ * 默认：每月 1 号和 16 号晚上 10 点（22:00）执行，每月 2 次
+ * 可通过 Docker 环境变量 AUTO_BACKUP_SCHEDULE 自定义 cron 表达式
  */
 function startAutoBackup() {
   if (!AUTO_BACKUP_ENABLED) {
@@ -130,12 +131,17 @@ function startAutoBackup() {
   }
 
   // cron 表达式：分 时 日 月 星期
-  // 每月 1 号和 16 号的 03:00 执行
-  const schedule = '0 3 1,16 * *';
+  // 默认：每月 1 号和 16 号的 22:00（晚上 10 点）执行，每月 2 次
+  // 可通过 Docker 环境变量覆盖，例如：
+  //   0 22 1,16 * *   每月 1 号、16 号 22:00（默认）
+  //   0 2 * * 0        每周日 02:00
+  //   0 22 1 * *       每月 1 号 22:00
+  const DEFAULT_SCHEDULE = '0 22 1,16 * *';
+  let schedule = (process.env.AUTO_BACKUP_SCHEDULE && process.env.AUTO_BACKUP_SCHEDULE.trim()) || DEFAULT_SCHEDULE;
 
   if (!cron.validate(schedule)) {
-    console.error('[AutoBackup] cron 表达式无效:', schedule);
-    return;
+    console.error(`[AutoBackup] 环境变量 AUTO_BACKUP_SCHEDULE 的值无效: "${schedule}"，回退到默认: ${DEFAULT_SCHEDULE}`);
+    schedule = DEFAULT_SCHEDULE;
   }
 
   cron.schedule(schedule, runAutoBackup, {
@@ -143,7 +149,7 @@ function startAutoBackup() {
     timezone: 'Asia/Shanghai',
   });
 
-  console.log(`[AutoBackup] 定时备份已启动: 每月1号和16号凌晨3点 (Asia/Shanghai), 保留最新 ${AUTO_BACKUP_KEEP} 个备份`);
+  console.log(`[AutoBackup] 定时备份已启动: "${schedule}" (Asia/Shanghai), 保留最新 ${AUTO_BACKUP_KEEP} 个备份`);
 }
 
 module.exports = { startAutoBackup, runAutoBackup };

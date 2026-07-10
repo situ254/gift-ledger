@@ -74,3 +74,6 @@ docker run -p 9205:9205 gift-ledger
 | DB_NAME | gift_ledger | 数据库名称 |
 | JWT_SECRET | - | JWT 签名密钥 |
 | NODE_ENV | production | 运行环境 |
+| AUTO_BACKUP | true | 自动备份总开关，设为 false 可关闭 |
+| AUTO_BACKUP_KEEP | 2 | 每个用户保留的最新备份文件个数 |
+| AUTO_BACKUP_SCHEDULE | 0 22 1,16 * * | 自动备份定时(cron: 分 时 日 月 星期)，默认每月1号、16号 22:00(晚上10点)，时区 Asia/Shanghai |

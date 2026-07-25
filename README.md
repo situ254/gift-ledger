@@ -16,6 +16,7 @@ gift-ledger/
 │   ├── public/       # 静态资源
 │   └── package.json
 ├── docker-compose.yml # 单容器 + 数据卷部署
+├── scripts/           # 运维脚本（历史数据迁移等）
 └── README.md
 ```
 
@@ -102,3 +103,35 @@ docker run -d -p 9205:9205 -v gift-ledger-data:/app/data --name gift-ledger gift
 | AUTO_BACKUP | true | 自动备份总开关，设为 false 可关闭 |
 | AUTO_BACKUP_KEEP | 2 | 每个用户保留的最新备份文件个数 |
 | AUTO_BACKUP_SCHEDULE | 0 22 1,16 * * | 自动备份定时(cron: 分 时 日 月 星期)，默认每月1号、16号 22:00(晚上10点)，时区 Asia/Shanghai |
+
+## 历史数据迁移（Excel → SQLite）
+
+`scripts/migrate_excel_to_sqlite.py` 用于把「人情笔记_*.xlsx」历史 Excel 直接写入 SQLite 数据库，适合一次性迁移大批量历史数据。相比 Web 端导入，本脚本会**自动补建缺失的亲友类型 / 事由**，并保证**幂等可重复执行**（重复行自动跳过）。
+
+### 用法
+
+```bash
+pip install openpyxl
+python scripts/migrate_excel_to_sqlite.py \
+    --db /vol1/1000/docker/gift-ledger/data/gift_ledger.db \
+    --excel 人情笔记_situdai_20260716_2200.xlsx \
+    --user situdai
+```
+
+参数说明：
+
+| 参数 | 说明 |
+|------|------|
+| `--db` | SQLite 数据库文件路径（即容器内的 `/app/data/gift_ledger.db`） |
+| `--excel` | 要导入的 Excel 文件，需含「收礼」「随礼」两个 sheet |
+| `--user` | 目标用户名，**须先在应用内注册**（脚本按用户名解析 user_id，不处理密码） |
+
+### 步骤（以 NAS 部署为例）
+
+1. `docker compose up -d` 部署并启动应用；
+2. 在应用 Web 界面注册目标用户（如 `situdai`、`zhouzhou`）；
+3. 停掉容器避免写入冲突：`docker compose stop`；
+4. 运行脚本，每个 Excel 对应一个 `--user` 执行一次；
+5. 重新启动：`docker compose start`。
+
+> 若 NAS 本身没有 Python / openpyxl，可临时起一个 Python 容器挂载同一数据卷执行，或把脚本与 Excel 拷到能运行 Python 的机器上对挂载出来的 db 文件执行。

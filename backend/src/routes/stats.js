@@ -11,7 +11,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
     // 收礼统计
     let receivedYearFilter = '';
     const receivedParams = [req.user.id];
-    if (year) { receivedYearFilter = ' AND YEAR(gift_book_date) = ?'; receivedParams.push(year); }
+    if (year) { receivedYearFilter = " AND strftime('%Y', gift_book_date) = ?"; receivedParams.push(year); }
 
     const [receivedResult] = await pool.query(
       `SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as count FROM gifts_received WHERE user_id = ?${receivedYearFilter}`,
@@ -21,7 +21,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
     // 随礼统计
     let givenYearFilter = '';
     const givenParams = [req.user.id];
-    if (year) { givenYearFilter = ' AND YEAR(gift_date) = ?'; givenParams.push(year); }
+    if (year) { givenYearFilter = " AND strftime('%Y', gift_date) = ?"; givenParams.push(year); }
 
     const [givenResult] = await pool.query(
       `SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as count FROM gifts_given WHERE user_id = ?${givenYearFilter}`,
@@ -101,8 +101,8 @@ router.get('/summary', authMiddleware, async (req, res) => {
     );
 
     // 可用年份列表
-    const [yearsReceived] = await pool.query('SELECT DISTINCT YEAR(gift_book_date) as year FROM gifts_received WHERE user_id = ? ORDER BY year DESC', [req.user.id]);
-    const [yearsGiven] = await pool.query('SELECT DISTINCT YEAR(gift_date) as year FROM gifts_given WHERE user_id = ? ORDER BY year DESC', [req.user.id]);
+    const [yearsReceived] = await pool.query("SELECT DISTINCT CAST(strftime('%Y', gift_book_date) AS INTEGER) as year FROM gifts_received WHERE user_id = ? ORDER BY year DESC", [req.user.id]);
+    const [yearsGiven] = await pool.query("SELECT DISTINCT CAST(strftime('%Y', gift_date) AS INTEGER) as year FROM gifts_given WHERE user_id = ? ORDER BY year DESC", [req.user.id]);
     const yearSet = new Set();
     for (const y of yearsReceived) if (y.year) yearSet.add(y.year);
     for (const y of yearsGiven) if (y.year) yearSet.add(y.year);

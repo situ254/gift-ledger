@@ -23,6 +23,11 @@ app.use('/api/data', require('./routes/importExport'));
 app.use('/api/backup', require('./routes/backup'));
 app.use('/api/admin', require('./routes/admin'));
 
+// 健康检查端点（供 Docker HEALTHCHECK 使用）
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // 静态文件服务（前端构建产物）
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -33,71 +38,77 @@ app.get('*', (req, res) => {
   }
 });
 
-// 数据库初始化
+// 数据库初始化（SQLite）
 async function initDatabase() {
   try {
+    // 用户表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         username VARCHAR(50) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
-        role ENUM('admin', 'user') DEFAULT 'user',
+        role TEXT DEFAULT 'user' CHECK(role IN ('admin', 'user')),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // 事由表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reasons (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY uk_user_reason (user_id, name),
+        UNIQUE (user_id, name),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // 亲友类型表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS contact_types (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY uk_user_type (user_id, name),
+        UNIQUE (user_id, name),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // 礼簿表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS gift_books (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         name VARCHAR(100) NOT NULL,
         date DATE NOT NULL,
         reason_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY uk_user_book (user_id, name),
+        UNIQUE (user_id, name),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (reason_id) REFERENCES reasons(id) ON DELETE SET NULL
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // 亲友表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS contacts (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         type_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY uk_user_contact (user_id, name),
+        UNIQUE (user_id, name),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (type_id) REFERENCES contact_types(id) ON DELETE SET NULL
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // 收礼记录表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS gifts_received (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         contact_name VARCHAR(50) NOT NULL,
         contact_type_id INT,
@@ -110,7 +121,7 @@ async function initDatabase() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (contact_type_id) REFERENCES contact_types(id) ON DELETE SET NULL,
         FOREIGN KEY (gift_book_id) REFERENCES gift_books(id) ON DELETE RESTRICT
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
     // 兼容旧表：如无 guests 列则添加
@@ -118,9 +129,10 @@ async function initDatabase() {
       await pool.query('ALTER TABLE gifts_received ADD COLUMN guests INT DEFAULT 0');
     } catch (e) { /* 列已存在则忽略 */ }
 
+    // 随礼记录表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS gifts_given (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL,
         contact_name VARCHAR(50) NOT NULL,
         contact_type_id INT,
@@ -132,12 +144,13 @@ async function initDatabase() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (contact_type_id) REFERENCES contact_types(id) ON DELETE SET NULL,
         FOREIGN KEY (reason_id) REFERENCES reasons(id) ON DELETE SET NULL
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
+    // WebDAV 配置表
     await pool.query(`
       CREATE TABLE IF NOT EXISTS webdav_configs (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INT NOT NULL UNIQUE,
         server_url VARCHAR(500),
         username VARCHAR(100),
@@ -145,7 +158,7 @@ async function initDatabase() {
         backup_path VARCHAR(500) DEFAULT '/',
         last_backup_time TIMESTAMP NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      )
     `);
 
     // 创建默认管理员账号（用户名和密码可通过环境变量配置）
@@ -171,66 +184,26 @@ async function initDatabase() {
     }
 
     console.log('Database initialized successfully');
-    retryCount = 0;
+    console.log(`SQLite database: ${pool.DB_PATH}`);
   } catch (err) {
-    retryCount++;
-    if (retryCount <= MAX_RETRIES) {
-      console.log(`Waiting for database... (attempt ${retryCount}/${MAX_RETRIES})`);
-      setTimeout(initDatabase, 3000);
-    } else {
-      console.error('Database initialization failed after max retries:', err.message);
-    }
+    console.error('Database initialization failed:', err.message);
+    throw err;
   }
 }
-
-// 等待 MySQL 端口可达
-const net = require('net');
-
-function waitForMySQL(host, port) {
-  return new Promise((resolve) => {
-    const check = () => {
-      const socket = new net.Socket();
-      socket.setTimeout(2000);
-      socket.on('connect', () => {
-        socket.destroy();
-        resolve(true);
-      });
-      socket.on('error', () => {
-        socket.destroy();
-        setTimeout(check, 2000);
-      });
-      socket.on('timeout', () => {
-        socket.destroy();
-        setTimeout(check, 2000);
-      });
-      socket.connect(port, host);
-    };
-    check();
-  });
-}
-
-let retryCount = 0;
-const MAX_RETRIES = 30;
 
 const { startAutoBackup } = require('./scheduler/autoBackup');
 
 async function start() {
-  // 先启动 HTTP 服务
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Gift Ledger Server running on port ${PORT}`);
-  });
-
-  // 等待 MySQL 端口可达
-  const dbHost = process.env.DB_HOST || 'localhost';
-  const dbPort = parseInt(process.env.DB_PORT || '3306');
-  console.log(`Waiting for MySQL at ${dbHost}:${dbPort}...`);
-  await waitForMySQL(dbHost, dbPort);
-  console.log('MySQL port is reachable, initializing database...');
-
-  initDatabase();
+  // 先初始化数据库（SQLite 为本地文件，初始化极快）
+  await initDatabase();
 
   // 启动定时自动备份
   startAutoBackup();
+
+  // 启动 HTTP 服务
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Gift Ledger Server running on port ${PORT}`);
+  });
 }
 
 start();

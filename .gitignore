@@ -11,3 +11,9 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+
+# SQLite 本地数据库文件及临时文件
+backend/data/
+*.db
+*.db-wal
+*.db-shm

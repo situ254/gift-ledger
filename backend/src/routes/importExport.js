@@ -33,7 +33,7 @@ router.get('/export', authMiddleware, async (req, res) => {
     const username = users.length > 0 ? users[0].username : 'unknown';
 
     if (type === 'received' || type === 'all') {
-      let sql = `SELECT gr.contact_name as '亲友姓名', ct.name as '亲友类型', gr.amount as '金额', gb.name as '所属礼簿', gr.gift_book_date as '礼簿日期', gr.notes as '备注', DATE_FORMAT(gr.created_at, '%Y-%m-%d %H:%i:%s') as '创建时间'
+      let sql = `SELECT gr.contact_name as '亲友姓名', ct.name as '亲友类型', gr.amount as '金额', gb.name as '所属礼簿', gr.gift_book_date as '礼簿日期', gr.notes as '备注', strftime('%Y-%m-%d %H:%M:%S', gr.created_at) as '创建时间'
         FROM gifts_received gr LEFT JOIN contact_types ct ON gr.contact_type_id = ct.id LEFT JOIN gift_books gb ON gr.gift_book_id = gb.id WHERE gr.user_id = ?`;
       const params = [req.user.id];
       if (date_from) { sql += ' AND gr.gift_book_date >= ?'; params.push(date_from); }
@@ -44,7 +44,7 @@ router.get('/export', authMiddleware, async (req, res) => {
     }
 
     if (type === 'given' || type === 'all') {
-      let sql = `SELECT gg.contact_name as '亲友姓名', ct.name as '亲友类型', gg.amount as '金额', r.name as '事由', gg.gift_date as '随礼日期', gg.notes as '备注', DATE_FORMAT(gg.created_at, '%Y-%m-%d %H:%i:%s') as '创建时间'
+      let sql = `SELECT gg.contact_name as '亲友姓名', ct.name as '亲友类型', gg.amount as '金额', r.name as '事由', gg.gift_date as '随礼日期', gg.notes as '备注', strftime('%Y-%m-%d %H:%M:%S', gg.created_at) as '创建时间'
         FROM gifts_given gg LEFT JOIN contact_types ct ON gg.contact_type_id = ct.id LEFT JOIN reasons r ON gg.reason_id = r.id WHERE gg.user_id = ?`;
       const params = [req.user.id];
       if (date_from) { sql += ' AND gg.gift_date >= ?'; params.push(date_from); }

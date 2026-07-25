@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
     if (contact_name) { sql += ' AND gr.contact_name LIKE ?'; params.push(`%${contact_name}%`); }
     if (date_from) { sql += ' AND gr.gift_book_date >= ?'; params.push(date_from); }
     if (date_to) { sql += ' AND gr.gift_book_date <= ?'; params.push(date_to); }
-    if (year) { sql += ' AND YEAR(gr.gift_book_date) = ?'; params.push(year); }
+    if (year) { sql += " AND strftime('%Y', gr.gift_book_date) = ?"; params.push(year); }
     sql += ' ORDER BY gr.gift_book_date DESC, gr.id DESC';
     const [rows] = await pool.query(sql, params);
     res.json(rows);

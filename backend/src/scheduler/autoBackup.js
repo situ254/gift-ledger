@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('../db');
 
-// 云端数据目录（与 backup.js 保持一致）
-const CLOUD_DATA_DIR = process.env.CLOUD_DATA_DIR || '/data';
+// 云端数据目录（与 backup.js 保持一致，统一持久化到 /app/data 卷下）
+const CLOUD_DATA_DIR = process.env.CLOUD_DATA_DIR || '/app/data/backups';
 // 自动备份开关
 const AUTO_BACKUP_ENABLED = process.env.AUTO_BACKUP !== 'false';
 // 每个用户保留的备份数
@@ -18,14 +18,14 @@ async function generateBackupBuffer(userId) {
   const wb = XLSX.utils.book_new();
 
   const [received] = await pool.query(
-    `SELECT gr.contact_name as '亲友姓名', ct.name as '亲友类型', gr.amount as '金额', gb.name as '所属礼簿', gr.gift_book_date as '礼簿日期', gr.notes as '备注', DATE_FORMAT(gr.created_at, '%Y-%m-%d %H:%i:%s') as '创建时间'
+    `SELECT gr.contact_name as '亲友姓名', ct.name as '亲友类型', gr.amount as '金额', gb.name as '所属礼簿', gr.gift_book_date as '礼簿日期', gr.notes as '备注', strftime('%Y-%m-%d %H:%M:%S', gr.created_at) as '创建时间'
     FROM gifts_received gr LEFT JOIN contact_types ct ON gr.contact_type_id = ct.id LEFT JOIN gift_books gb ON gr.gift_book_id = gb.id WHERE gr.user_id = ?`,
     [userId]
   );
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(received), '收礼');
 
   const [given] = await pool.query(
-    `SELECT gg.contact_name as '亲友姓名', ct.name as '亲友类型', gg.amount as '金额', r.name as '事由', gg.gift_date as '随礼日期', gg.notes as '备注', DATE_FORMAT(gg.created_at, '%Y-%m-%d %H:%i:%s') as '创建时间'
+    `SELECT gg.contact_name as '亲友姓名', ct.name as '亲友类型', gg.amount as '金额', r.name as '事由', gg.gift_date as '随礼日期', gg.notes as '备注', strftime('%Y-%m-%d %H:%M:%S', gg.created_at) as '创建时间'
     FROM gifts_given gg LEFT JOIN contact_types ct ON gg.contact_type_id = ct.id LEFT JOIN reasons r ON gg.reason_id = r.id WHERE gg.user_id = ?`,
     [userId]
   );

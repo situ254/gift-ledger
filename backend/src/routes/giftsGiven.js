@@ -17,7 +17,7 @@ router.get('/', authMiddleware, async (req, res) => {
     if (date_from) { sql += ' AND gg.gift_date >= ?'; params.push(date_from); }
     if (date_to) { sql += ' AND gg.gift_date <= ?'; params.push(date_to); }
     if (reason_id) { sql += ' AND gg.reason_id = ?'; params.push(reason_id); }
-    if (year) { sql += ' AND YEAR(gg.gift_date) = ?'; params.push(year); }
+    if (year) { sql += " AND strftime('%Y', gg.gift_date) = ?"; params.push(year); }
     sql += ' ORDER BY gg.gift_date DESC, gg.id DESC';
     const [rows] = await pool.query(sql, params);
     res.json(rows);

@@ -1,43 +1,39 @@
 # 人情记账系统 (Gift Ledger) - SQLite 单容器部署
+# 部署路径（NAS）：/vol1/1000/docker/gift-ledger/
 #
-# 使用方法：
-#   1. 拉取镜像运行：docker compose up -d
-#   2. 本地构建运行：将下方 image 注释，取消 build 注释后 docker compose up -d --build
+# 使用方法：docker compose up -d
 #
-# 数据持久化：所有数据（SQLite 数据库 + 备份文件）保存在 gift-ledger-data 卷中，
+# 数据持久化：
+#   SQLite 数据库 + 备份文件 → /vol1/1000/docker/gift-ledger/data   (容器内 /app/data)
+#   上传文件              → /vol1/1000/docker/gift-ledger/uploads (容器内 /tmp/uploads)
 # 容器重启或重建后数据不会丢失。
+#
+# 说明：已移除 MySQL 依赖，数据库改为本地 SQLite 文件，单容器即可运行。
 
 version: '3.8'
 
 services:
   gift-ledger:
-    # 二选一：使用已发布镜像 或 本地构建
+    container_name: gift-ledger-app
     image: ghcr.io/situ254/gift-ledger:latest
-    # build:
-    #   context: ./backend
-    #   dockerfile: Dockerfile.optimized
-    container_name: gift-ledger
+    # 每次 up 都拉取最新镜像（CI 重新构建后确保用到新版本，而非本地旧镜像）
+    pull_policy: always
     ports:
-      - "9205:9205"
+      - 9205:9205
     volumes:
-      - gift-ledger-data:/app/data
+      - /vol1/1000/docker/gift-ledger/uploads:/tmp/uploads
+      - /vol1/1000/docker/gift-ledger/data:/app/data
     environment:
       - PORT=9205
-      # SQLite 数据库文件路径
+      # SQLite 数据库文件路径（容器内 /app/data，已挂载到宿主机持久化）
       - DB_PATH=/app/data/gift_ledger.db
       # 备份数据目录（与数据库统一持久化）
       - CLOUD_DATA_DIR=/app/data/backups
-      # JWT 签名密钥（生产环境请修改）
-      - JWT_SECRET=gift_ledger_secret_key_2024
-      # 默认管理员账号（首次启动时创建，之后可通过环境变量覆盖密码）
-      - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=admin123
+      # JWT 签名密钥（与你的原部署保持一致）
+      - JWT_SECRET=scH9gJoHbVNLOL0BF35nRe0mFlyZ3TyY
+      - TZ=Asia/Shanghai
       # 自动备份配置
-      - AUTO_BACKUP=true
+      - AUTO_BACKUP_SCHEDULE=0 22 1,16 * *   # 每月1号、16号 晚上10点
       - AUTO_BACKUP_KEEP=2
-      # cron: 分 时 日 月 星期，默认每月1号、16号 22:00（晚上10点），时区 Asia/Shanghai
-      - AUTO_BACKUP_SCHEDULE=0 22 1,16 * *
-    restart: unless-stopped
-
-volumes:
-  gift-ledger-data:
+      # - AUTO_BACKUP=false                   # 取消注释可关闭
+    restart: always

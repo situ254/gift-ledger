@@ -243,39 +243,69 @@ async function ensureContact(userId, contactName, contactTypeId) {
 }
 
 /**
- * 日期格式化（处理Excel日期序列号，仅日期部分）
+ * 解析日期字符串为本地 年/月/日/时/分/秒（时区无关，不依赖 toISOString 转 UTC）
+ * 支持格式：2021-05-03、2021-05-03 00:00:43、2021/05/03、2021.05.03 等。
+ * 无法用正则解析时退回 Date 解析（按本地时区读取分量），
+ * 目的是避免「new Date(str).toISOString()」在正向时区下把日期回退一天的问题。
+ */
+function parseYMD(value) {
+  const s = String(value).trim();
+  const m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (m) {
+    const y = +m[1], mo = +m[2], d = +m[3];
+    const hh = m[4] != null ? +m[4] : 0;
+    const mm = m[5] != null ? +m[5] : 0;
+    const ss = m[6] != null ? +m[6] : 0;
+    if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) return { y, mo, d, hh, mm, ss };
+  }
+  const dt = new Date(value);
+  if (!isNaN(dt.getTime())) {
+    return { y: dt.getFullYear(), mo: dt.getMonth() + 1, d: dt.getDate(), hh: dt.getHours(), mm: dt.getMinutes(), ss: dt.getSeconds() };
+  }
+  return null;
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+/**
+ * 日期格式化（仅日期部分），时区安全。
+ * Excel 日期序列号按 UTC 定义，toISOString 取日期部分准确，保持不变。
  */
 function formatDate(value) {
-  if (!value) return null;
+  if (value == null || value === '') return null;
   if (typeof value === 'number') {
     const date = new Date((value - 25569) * 86400 * 1000);
     return date.toISOString().split('T')[0];
   }
+  if (value instanceof Date) {
+    return `${value.getFullYear()}-${pad2(value.getMonth() + 1)}-${pad2(value.getDate())}`;
+  }
   const str = String(value).trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-  const d = new Date(str);
-  if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
-  return null;
+  const p = parseYMD(str);
+  return p ? `${p.y}-${pad2(p.mo)}-${pad2(p.d)}` : null;
 }
 
 /**
- * 日期时间格式化（处理Excel日期序列号，支持日期+时间）
+ * 日期时间格式化（支持日期+时间），时区安全。
  */
 function formatDateTime(value) {
-  if (!value) return null;
+  if (value == null || value === '') return null;
   if (typeof value === 'number') {
-    // Excel日期序列号（含小数部分为时间）
+    // Excel 日期序列号（含小数部分为时间），按 UTC 定义，保持不变
     const date = new Date((value - 25569) * 86400 * 1000);
     return date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+  }
+  if (value instanceof Date) {
+    return `${value.getFullYear()}-${pad2(value.getMonth() + 1)}-${pad2(value.getDate())} ${pad2(value.getHours())}:${pad2(value.getMinutes())}:${pad2(value.getSeconds())}`;
   }
   const str = String(value).trim();
   // 已经是标准格式 "2026-04-27 10:45:58"
   if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(str)) return str;
   // 只有日期 "2026-04-27"
   if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str + ' 00:00:00';
-  const d = new Date(str);
-  if (!isNaN(d.getTime())) return d.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
-  return null;
+  const p = parseYMD(str);
+  return p ? `${p.y}-${pad2(p.mo)}-${pad2(p.d)} ${pad2(p.hh)}:${pad2(p.mm)}:${pad2(p.ss)}` : null;
 }
 
 /**

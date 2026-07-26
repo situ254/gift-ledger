@@ -114,8 +114,8 @@ docker run -d -p 9205:9205 -v gift-ledger-data:/app/data --name gift-ledger gift
 pip install openpyxl
 python scripts/migrate_excel_to_sqlite.py \
     --db /vol1/1000/docker/gift-ledger/data/gift_ledger.db \
-    --excel 人情笔记_situdai_20260716_2200.xlsx \
-    --user situdai
+    --excel 人情笔记_示例_20260716_2200.xlsx \
+    --user your_username
 ```
 
 参数说明：
@@ -129,7 +129,7 @@ python scripts/migrate_excel_to_sqlite.py \
 ### 步骤（以 NAS 部署为例）
 
 1. `docker compose up -d` 部署并启动应用；
-2. 在应用 Web 界面注册目标用户（如 `situdai`、`zhouzhou`）；
+2. 在应用 Web 界面注册目标用户（每个要导入数据的账号）；
 3. 停掉容器避免写入冲突：`docker compose stop`；
 4. 运行脚本，每个 Excel 对应一个 `--user` 执行一次；
 5. 重新启动：`docker compose start`。

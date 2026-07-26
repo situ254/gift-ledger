@@ -18,8 +18,8 @@
 用法：
   python migrate_excel_to_sqlite.py \
       --db /vol1/1000/docker/gift-ledger/data/gift_ledger.db \
-      --excel 人情笔记_situdai_20260716_2200.xlsx \
-      --user situdai
+      --excel 人情笔记_示例_20260716_2200.xlsx \
+      --user your_username
 
 依赖：
   pip install openpyxl

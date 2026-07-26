@@ -23,9 +23,9 @@ export default function Register() {
   }, [username, password, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ricewhite p-4">
+    <div className="min-h-screen flex items-center justify-center auth-bg p-4">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-8 text-primary-500">注册账号</h1>
+        <h1 className="text-2xl font-bold text-center mb-8 text-white drop-shadow-sm">注册账号</h1>
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div><label className="block text-sm font-medium text-gray-700 mb-1">用户名</label>

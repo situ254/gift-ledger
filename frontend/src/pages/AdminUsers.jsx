@@ -19,7 +19,16 @@ export default function AdminUsers() {
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { if (!isAdmin) { navigate(ROUTES.HOME); return; } loadData(); }, [isAdmin, navigate, loadData]);
+  useEffect(() => {
+    if (!isAdmin) { navigate(ROUTES.HOME); return; }
+    let cancelled = false;
+    (async () => {
+      try { const res = await adminApi.listUsers(); if (!cancelled) setUsers(res.data); }
+      catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [isAdmin, navigate]);
 
   const handleDelete = useCallback(async (id) => {
     if (!confirm(MSG.CONFIRM_DELETE_USER)) return;

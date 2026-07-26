@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { giftsGivenApi, reasonsApi } from '../api';
-import { formatCurrency, groupByAndStats, extractYear } from '../utils/helpers';
+import { formatCurrency, extractYear } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, EmptyState, CardItem } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
@@ -12,18 +12,17 @@ export default function GiftsGiven() {
   const [gifts, setGifts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadData = useCallback(async () => {
-    try {
-      const [giftsRes] = await Promise.all([giftsGivenApi.list(), reasonsApi.list()]);
-      setGifts(giftsRes.data);
-    } catch {
-      toast.error(MSG.LOAD_FAIL);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [giftsRes] = await Promise.all([giftsGivenApi.list(), reasonsApi.list()]);
+        if (!cancelled) setGifts(giftsRes.data);
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const byYear = useMemo(() => {
     const groups = {};
@@ -74,7 +73,7 @@ export default function GiftsGiven() {
     <div>
       <PageHeader title="随礼" variant="rounded"
         action={<button onClick={() => navigate(ROUTES.GIVEN.NEW)} className="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">+ 新增</button>} />
-      <div className="page-container -mt-4 space-y-3">
+      <div className="page-container -mt-4 responsive-list">
         {years.map(year => {
           const stats = yearStats[year];
           const reasonEntries = Object.entries(stats.reasonDist);

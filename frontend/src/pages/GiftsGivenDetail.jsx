@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { giftsGivenApi, reasonsApi } from '../api';
 import { formatCurrency, monthDay } from '../utils/helpers';
@@ -14,18 +14,17 @@ export default function GiftsGivenDetail() {
   const [loading, setLoading] = useState(true);
   const [activeReason, setActiveReason] = useState('');
 
-  const loadData = useCallback(async () => {
-    try {
-      const [giftsRes] = await Promise.all([giftsGivenApi.list({ year }), reasonsApi.list()]);
-      setGifts(giftsRes.data);
-    } catch {
-      toast.error(MSG.LOAD_FAIL);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [giftsRes] = await Promise.all([giftsGivenApi.list({ year }), reasonsApi.list()]);
+        if (!cancelled) setGifts(giftsRes.data);
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [year]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const reasonGroups = useMemo(() => {
     const map = {};

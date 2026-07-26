@@ -12,14 +12,16 @@ export default function ContactForm() {
   const { id } = useParams();
   const isEdit = !!id;
   const [contactTypes, setContactTypes] = useState([]);
-  const [contactNames, setContactNames] = useState([]);
 
-  const loadDropdowns = useCallback(async () => {
-    try {
-      const [t, c] = await Promise.all([contactTypesApi.list(), contactsApi.list()]);
-      setContactTypes(t.data);
-      setContactNames(c.data.map(x => x.name));
-    } catch { /* silent */ }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [t] = await Promise.all([contactTypesApi.list(), contactsApi.list()]);
+        if (!cancelled) setContactTypes(t.data);
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const mapEntity = useCallback(c => ({
@@ -40,7 +42,6 @@ export default function ContactForm() {
     },
   });
 
-  useEffect(() => { loadDropdowns(); }, [loadDropdowns]);
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
 
   if (isEdit && !loaded) return <LoadingSpinner />;

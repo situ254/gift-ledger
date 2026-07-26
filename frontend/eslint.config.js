@@ -17,5 +17,9 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Context provider + hook 同文件导出是标准模式，此规则会误报，降为警告
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])

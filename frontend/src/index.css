@@ -9,17 +9,10 @@
    全局动画基础设施
    ============================================================ */
 
-/* GPU 加速：所有可交互元素默认启用合成层 */
+/* 触摸优化（仅保留必要项，避免全局 will-change 造成合成层爆炸导致卡顿） */
 *, *::before, *::after {
   -webkit-tap-highlight-color: transparent;  /* 消除移动端点击高亮 */
   -webkit-touch-callout: none;               /* 禁止长按弹菜单 */
-}
-
-/* 可交互元素 GPU 合成提示 */
-button, a, [role="button"], .card, .card-glass, .card-glass:hover,
-.btn-primary, .btn-outline, .input-field, .select-field {
-  will-change: transform;
-  transform: translateZ(0);
 }
 
 /* 触摸滚动优化 */
@@ -86,14 +79,14 @@ button, a, [role="button"], .card, .card-glass, .card-glass:hover,
    ============================================================ */
 .glass {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 .glass-gold {
   background: rgba(212, 175, 55, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
@@ -107,7 +100,9 @@ button, a, [role="button"], .card, .card-glass, .card-glass:hover,
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(255,255,255,0.20), transparent 45%),
+    linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
   padding-inline: 1rem;
   padding-block: 0.75rem;
   color: var(--color-white);
@@ -117,7 +112,9 @@ button, a, [role="button"], .card, .card-glass, .card-glass:hover,
 .page-header-rounded {
   border-bottom-right-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
-  background: linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(255,255,255,0.20), transparent 45%),
+    linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
   padding-inline: 1rem;
   padding-top: 1rem;
   padding-bottom: 2rem;
@@ -133,6 +130,70 @@ button, a, [role="button"], .card, .card-glass, .card-glass:hover,
   padding-bottom: 5rem;
   flex: 1;
   overflow-y: auto;
+}
+/* 桌面端无底部导航，减少底部留白、增加顶/侧留白 */
+@media (min-width: 768px) {
+  .page-container {
+    padding-bottom: 2rem;
+    padding-block-start: 1rem;
+  }
+}
+
+/* ============================================================
+   响应式列表网格：移动端纵向堆叠，平板 2 列，桌面 3 列
+   ============================================================ */
+.responsive-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.responsive-list-sm { display: flex; flex-direction: column; gap: 0.5rem; }
+@media (min-width: 768px) {
+  .responsive-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .responsive-list-sm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+}
+@media (min-width: 1280px) {
+  .responsive-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .responsive-list-sm { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ============================================================
+   侧边栏激活项
+   ============================================================ */
+.nav-item-active {
+  background: linear-gradient(135deg, #C62828 0%, #8B1538 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25);
+}
+.nav-item-active:hover { background: linear-gradient(135deg, #B71C1C 0%, #7A1230 100%); }
+
+/* ============================================================
+   环境渐变背景（现代化渐变底，始终可见）
+   ============================================================ */
+.app-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  background:
+    radial-gradient(1100px 520px at 8% -8%, rgba(198, 40, 40, 0.07), transparent 60%),
+    radial-gradient(900px 460px at 108% 6%, rgba(212, 175, 55, 0.08), transparent 55%),
+    linear-gradient(180deg, #FBF9F5 0%, #F6F0E7 100%);
+}
+
+/* ============================================================
+   登录 / 注册渐变背景
+   ============================================================ */
+.auth-bg {
+  background: linear-gradient(135deg, #E63946 0%, #C62828 50%, #8B1538 100%);
+}
+
+/* ============================================================
+   页面切换动画（流畅交互）
+   ============================================================ */
+.page-enter { animation: pageEnter 0.32s var(--ease-out) both; }
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+  .card:hover, .card-glass:hover { transform: none; }
 }
 
 /* ============================================================
@@ -238,8 +299,8 @@ button, a, [role="button"], .card, .card-glass, .card-glass:hover,
   border-radius: 0.75rem;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.08);
   transition: transform 0.2s var(--ease-snap), box-shadow 0.2s var(--ease-snap);

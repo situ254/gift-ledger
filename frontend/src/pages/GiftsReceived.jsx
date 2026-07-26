@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { giftsReceivedApi, giftBooksApi } from '../api';
-import { formatCurrency, extractYear } from '../utils/helpers';
+import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, EmptyState, CardItem } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
@@ -12,18 +12,17 @@ export default function GiftsReceived() {
   const [gifts, setGifts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadData = useCallback(async () => {
-    try {
-      const [giftsRes, booksRes] = await Promise.all([giftsReceivedApi.list(), giftBooksApi.list()]);
-      setGifts(giftsRes.data);
-    } catch {
-      toast.error(MSG.LOAD_FAIL);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [giftsRes] = await Promise.all([giftsReceivedApi.list(), giftBooksApi.list()]);
+        if (!cancelled) setGifts(giftsRes.data);
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const byYear = useMemo(() => {
     const groups = {};
@@ -56,7 +55,7 @@ export default function GiftsReceived() {
         {yearKeys.length === 0 ? (
           <EmptyState emoji="📭" text="暂无收礼记录" actionLabel="新增收礼" onAction={() => navigate(ROUTES.RECEIVED.NEW)} />
         ) : (
-          <div className="space-y-3">
+          <div className="responsive-list">
             {yearKeys.map(year => {
               const stats = yearStats[year];
               return (

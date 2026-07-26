@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { contactsApi, contactTypesApi } from '../api';
-import { formatCurrency, monthDay } from '../utils/helpers';
-import { LoadingSpinner, PageHeader, CardItem } from '../components/UI';
+import { contactsApi } from '../api';
+import { formatCurrency } from '../utils/helpers';
+import { LoadingSpinner, PageHeader } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -18,13 +18,15 @@ export default function ContactDetail() {
   const [activeTab, setActiveTab] = useState('received');
   const [showMenu, setShowMenu] = useState(false);
 
-  const loadData = useCallback(async () => {
-    try { setDetail((await contactsApi.getDetail(decodedName)).data); }
-    catch { toast.error(MSG.LOAD_DETAIL_FAIL); navigate(ROUTES.HOME); }
-    finally { setLoading(false); }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try { if (!cancelled) setDetail((await contactsApi.getDetail(decodedName)).data); }
+      catch { toast.error(MSG.LOAD_DETAIL_FAIL); navigate(ROUTES.HOME); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [decodedName, navigate]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const { total_received = 0, total_given = 0, net = 0, received_records = [], given_records = [] } = detail || {};
 

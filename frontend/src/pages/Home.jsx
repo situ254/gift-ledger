@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { statsApi } from '../api';
-import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, YearSelector, CardItem } from '../components/UI';
 import { ROUTES } from '../constants/routes';
@@ -17,22 +16,23 @@ export default function Home() {
   const [selectedYear, setSelectedYear] = useState('');
   const [availableYears, setAvailableYears] = useState([]);
 
-  const loadData = useCallback(async () => {
-    try {
-      const params = selectedYear ? { year: selectedYear } : {};
-      const res = await statsApi.summary(params);
-      setSummary(res.data);
-      setAvailableYears(res.data.availableYears || []);
-      setOweMe(res.data.oweMe || []);
-      setIOwe(res.data.iOwe || []);
-    } catch {
-      toast.error(MSG.LOAD_FAIL);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = selectedYear ? { year: selectedYear } : {};
+        const res = await statsApi.summary(params);
+        if (!cancelled) {
+          setSummary(res.data);
+          setAvailableYears(res.data.availableYears || []);
+          setOweMe(res.data.oweMe || []);
+          setIOwe(res.data.iOwe || []);
+        }
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [selectedYear]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const net = useMemo(() => (summary?.totalReceived || 0) - (summary?.totalGiven || 0), [summary]);
 
@@ -80,7 +80,7 @@ export default function Home() {
         {oweMe.length > 0 && (
           <div className="mb-4">
             <h2 className="text-sm font-bold text-gray-700 mb-2">🔴 别人差我礼</h2>
-            <div className="space-y-2">
+            <div className="responsive-list-sm">
               {oweMe.map(item => (
                 <CardItem key={item.contact_name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.contact_name))}>
                   <div className="flex items-center justify-between">
@@ -97,7 +97,7 @@ export default function Home() {
         {iOwe.length > 0 && (
           <div className="mb-4">
             <h2 className="text-sm font-bold text-gray-700 mb-2">🟡 我差别人礼</h2>
-            <div className="space-y-2">
+            <div className="responsive-list-sm">
               {iOwe.map(item => (
                 <CardItem key={item.contact_name} onClick={() => navigate(ROUTES.CONTACTS.DETAIL(item.contact_name))}>
                   <div className="flex items-center justify-between">

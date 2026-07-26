@@ -6,18 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
   const [token, setToken] = useState(() => localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (token) {
-      authApi.getMe().then(res => {
-        setUser(res.data);
-        localStorage.setItem('user', JSON.stringify(res.data));
-      }).catch(() => logout()).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, []);
+  const [loading, setLoading] = useState(() => !!localStorage.getItem('token'));
 
   const login = (newToken, newUser) => {
     localStorage.setItem('token', newToken);
@@ -32,6 +21,14 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
   };
+
+  useEffect(() => {
+    if (!token) return;
+    authApi.getMe().then(res => {
+      setUser(res.data);
+      localStorage.setItem('user', JSON.stringify(res.data));
+    }).catch(() => logout()).finally(() => setLoading(false));
+  }, [token]);
 
   const isAdmin = user?.role === 'admin';
 

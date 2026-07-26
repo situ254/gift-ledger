@@ -25,13 +25,19 @@ export default function GiftGivenForm() {
   const [contactTypes, setContactTypes] = useState([]);
   const [contactNames, setContactNames] = useState([]);
 
-  const loadDropdowns = useCallback(async () => {
-    try {
-      const [r, t, c] = await Promise.all([reasonsApi.list(), contactTypesApi.list(), contactsApi.list()]);
-      setReasons(r.data);
-      setContactTypes(t.data);
-      setContactNames(c.data.map(x => x.name));
-    } catch { /* silent - dropdowns are optional */ }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [r, t, c] = await Promise.all([reasonsApi.list(), contactTypesApi.list(), contactsApi.list()]);
+        if (!cancelled) {
+          setReasons(r.data);
+          setContactTypes(t.data);
+          setContactNames(c.data.map(x => x.name));
+        }
+      } catch { /* silent - dropdowns are optional */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const mapEntity = useCallback(g => ({
@@ -93,7 +99,6 @@ export default function GiftGivenForm() {
     }
   }, [id, form.contact_name, navigate]);
 
-  useEffect(() => { loadDropdowns(); }, [loadDropdowns]);
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
 
   if (isEdit && !loaded) return <LoadingSpinner />;

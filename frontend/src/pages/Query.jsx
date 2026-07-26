@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { statsApi } from '../api';
 import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, YearSelector, FilterPills } from '../components/UI';
-import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';
 
@@ -24,15 +23,18 @@ export default function Query() {
   const [subFilter, setSubFilter] = useState('reason');
   const [selectedYear, setSelectedYear] = useState('');
 
-  const loadData = useCallback(async () => {
-    try {
-      const params = selectedYear ? { year: selectedYear } : {};
-      setData((await statsApi.summary(params)).data);
-    } catch { toast.error(MSG.LOAD_STATS_FAIL); }
-    finally { setLoading(false); }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = selectedYear ? { year: selectedYear } : {};
+        const res = await statsApi.summary(params);
+        if (!cancelled) setData(res.data);
+      } catch { toast.error(MSG.LOAD_STATS_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [selectedYear]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const { totalReceived = 0, totalGiven = 0, receivedCount = 0, givenCount = 0,
     netAmount = 0, oweMe = [], iOwe = [],
@@ -115,7 +117,7 @@ export default function Query() {
           </div>
         )}
         {activeTab === 'iOwe' && (
-          <div className="space-y-2">
+          <div className="responsive-list-sm">
             {iOwe.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <div className="text-4xl mb-2">✅</div>
@@ -131,7 +133,7 @@ export default function Query() {
           </div>
         )}
         {activeTab === 'oweMe' && (
-          <div className="space-y-2">
+          <div className="responsive-list-sm">
             {oweMe.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <div className="text-4xl mb-2">✅</div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { contactsApi } from '../api';
 import { LoadingSpinner } from '../components/UI';
@@ -12,14 +12,17 @@ export default function ContactsList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  const loadData = useCallback(async () => {
-    try {
-      setContacts((await contactsApi.list()).data);
-    } catch { toast.error(MSG.LOAD_FAIL); }
-    finally { setLoading(false); }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await contactsApi.list();
+        if (!cancelled) setContacts(res.data);
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const filtered = useMemo(() => contacts.filter(c => {
     if (search && !c.name.includes(search)) return false;

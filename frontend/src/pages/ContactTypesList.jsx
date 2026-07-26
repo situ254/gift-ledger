@@ -18,7 +18,15 @@ export default function ContactTypesList() {
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try { const res = await contactTypesApi.list(); if (!cancelled) setTypes(res.data); }
+      catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const { handleDelete } = useDeleteWithConfirm(
     contactTypesApi.delete, MSG.CONFIRM_DELETE_TYPE, loadData

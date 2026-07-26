@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { giftsReceivedApi, giftBooksApi } from '../api';
 import { formatCurrency, monthDay } from '../utils/helpers';
@@ -14,19 +14,18 @@ export default function GiftsReceivedDetail() {
   const [loading, setLoading] = useState(true);
   const [activeReason, setActiveReason] = useState('');
 
-  const loadData = useCallback(async () => {
-    try {
-      const [giftsRes] = await Promise.all([giftsReceivedApi.list(), giftBooksApi.list()]);
-      const yearGifts = giftsRes.data.filter(g => g.gift_book_date && g.gift_book_date.startsWith(year));
-      setGifts(yearGifts);
-    } catch {
-      toast.error(MSG.LOAD_FAIL);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [giftsRes] = await Promise.all([giftsReceivedApi.list(), giftBooksApi.list()]);
+        const yearGifts = giftsRes.data.filter(g => g.gift_book_date && g.gift_book_date.startsWith(year));
+        if (!cancelled) setGifts(yearGifts);
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [year]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const reasonGroups = useMemo(() => {
     const map = {};

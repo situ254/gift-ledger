@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { giftBooksApi, giftsReceivedApi, contactTypesApi } from '../api';
+import { giftBooksApi, giftsReceivedApi } from '../api';
 import { formatCurrency, monthDay } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, FilterPills, AmountBadge } from '../components/UI';
 import { ROUTES } from '../constants/routes';
@@ -15,16 +15,20 @@ export default function GiftBookDetail() {
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('');
 
-  const loadData = useCallback(async () => {
-    try {
-      const [bookRes, giftsRes] = await Promise.all([giftBooksApi.get(id), giftsReceivedApi.list({ gift_book_id: id })]);
-      setGiftBook(bookRes.data);
-      setReceivedGifts(giftsRes.data);
-    } catch { toast.error(MSG.LOAD_FAIL); navigate(ROUTES.GIFT_BOOKS.LIST); }
-    finally { setLoading(false); }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [bookRes, giftsRes] = await Promise.all([giftBooksApi.get(id), giftsReceivedApi.list({ gift_book_id: id })]);
+        if (!cancelled) {
+          setGiftBook(bookRes.data);
+          setReceivedGifts(giftsRes.data);
+        }
+      } catch { toast.error(MSG.LOAD_FAIL); navigate(ROUTES.GIFT_BOOKS.LIST); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, [id, navigate]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const typeGroups = useMemo(() => {
     const map = {};

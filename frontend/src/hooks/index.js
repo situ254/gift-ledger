@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { MSG, DEFAULTS } from '../constants/messages';
+import { MSG } from '../constants/messages';
 
 /**
  * 通用异步数据加载 Hook
@@ -14,14 +14,12 @@ export function useAsyncData(fetchFn, deps = [], errorMsg = MSG.LOAD_FAIL) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const fetchRef = useRef(fetchFn);
-  fetchRef.current = fetchFn;
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchRef.current();
+      const result = await fetchFn();
       setData(result);
     } catch (err) {
       setError(err);
@@ -29,10 +27,21 @@ export function useAsyncData(fetchFn, deps = [], errorMsg = MSG.LOAD_FAIL) {
     } finally {
       setLoading(false);
     }
-  }, [errorMsg]);
+  }, [fetchFn, errorMsg]);
 
   useEffect(() => {
-    refresh();
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchFn();
+        if (!cancelled) setData(result);
+      } catch (err) {
+        if (!cancelled) { setError(err); toast.error(errorMsg); }
+      } finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
@@ -47,7 +56,7 @@ export function useAsyncData(fetchFn, deps = [], errorMsg = MSG.LOAD_FAIL) {
  * @param {function} [options.validate]
  * @param {boolean} [options.isEdit]
  */
-export function useForm({ initialValues, onSubmit, validate, isEdit = false }) {
+export function useForm({ initialValues, onSubmit, validate }) {
   const [form, setForm] = useState(initialValues);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -102,10 +111,10 @@ export function useDeleteWithConfirm(deleteFn, confirmMsg, onSuccess) {
 export function useEditEntity(listFn, id, fallbackPath, mapFn, errorMsg = MSG.LOAD_DETAIL_FAIL) {
   const navigate = useNavigate();
   const [entity, setEntity] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(() => !id);
 
   useEffect(() => {
-    if (!id) { setLoaded(true); return; }
+    if (!id) return;
     listFn().then(res => {
       const found = res.data.find(e => String(e.id) === String(id));
       if (found) {

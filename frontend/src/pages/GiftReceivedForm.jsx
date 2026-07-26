@@ -4,7 +4,7 @@ import { giftsReceivedApi, contactTypesApi, giftBooksApi, contactsApi } from '..
 import { useForm, useEditEntity } from '../hooks';
 import { LoadingSpinner, PageHeader, FormField } from '../components/UI';
 import { ROUTES } from '../constants/routes';
-import { MSG, DEFAULTS } from '../constants/messages';
+import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';
 
 const DELETE_CONFIRM_MSG = '确定删除这条记录吗？删除后不可恢复。';
@@ -24,13 +24,19 @@ export default function GiftReceivedForm() {
   const [giftBooks, setGiftBooks] = useState([]);
   const [contactNames, setContactNames] = useState([]);
 
-  const loadDropdowns = useCallback(async () => {
-    try {
-      const [t, b, c] = await Promise.all([contactTypesApi.list(), giftBooksApi.list(), contactsApi.list()]);
-      setContactTypes(t.data);
-      setGiftBooks(b.data);
-      setContactNames(c.data.map(x => x.name));
-    } catch { /* silent */ }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [t, b, c] = await Promise.all([contactTypesApi.list(), giftBooksApi.list(), contactsApi.list()]);
+        if (!cancelled) {
+          setContactTypes(t.data);
+          setGiftBooks(b.data);
+          setContactNames(c.data.map(x => x.name));
+        }
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const mapEntity = useCallback(g => ({
@@ -91,7 +97,6 @@ export default function GiftReceivedForm() {
     }
   }, [id, form.contact_name, navigate]);
 
-  useEffect(() => { loadDropdowns(); }, [loadDropdowns]);
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
 
   if (isEdit && !loaded) return <LoadingSpinner />;

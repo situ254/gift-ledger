@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { giftBooksApi, giftsReceivedApi } from '../api';
 import { formatCurrency, shortenDate, lunarDate } from '../utils/helpers';
@@ -15,34 +15,38 @@ export default function GiftBookList() {
   const [selectedYear, setSelectedYear] = useState('');
   const [years, setYears] = useState([]);
 
-  const loadData = useCallback(async () => {
-    try {
-      const booksRes = await giftBooksApi.list();
-      const bookData = booksRes.data;
-      const statsResults = await Promise.all(
-        bookData.map(book => giftsReceivedApi.list({ gift_book_id: book.id }).catch(() => null))
-      );
-      const statsMap = {};
-      const yearSet = new Set();
-      bookData.forEach((book, i) => {
-        const res = statsResults[i];
-        if (res) {
-          const typeCount = {};
-          res.data.forEach(g => { const t = g.contact_type_name || '其它'; typeCount[t] = (typeCount[t] || 0) + 1; });
-          statsMap[book.id] = { totalRecords: res.data.length, totalAmount: res.data.reduce((s, g) => s + Number(g.amount), 0), typeCount };
-        } else {
-          statsMap[book.id] = { totalRecords: 0, totalAmount: 0, typeCount: {} };
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const booksRes = await giftBooksApi.list();
+        const bookData = booksRes.data;
+        const statsResults = await Promise.all(
+          bookData.map(book => giftsReceivedApi.list({ gift_book_id: book.id }).catch(() => null))
+        );
+        const statsMap = {};
+        const yearSet = new Set();
+        bookData.forEach((book, i) => {
+          const res = statsResults[i];
+          if (res) {
+            const typeCount = {};
+            res.data.forEach(g => { const t = g.contact_type_name || '其它'; typeCount[t] = (typeCount[t] || 0) + 1; });
+            statsMap[book.id] = { totalRecords: res.data.length, totalAmount: res.data.reduce((s, g) => s + Number(g.amount), 0), typeCount };
+          } else {
+            statsMap[book.id] = { totalRecords: 0, totalAmount: 0, typeCount: {} };
+          }
+          if (book.date) yearSet.add(book.date.slice(0, 4));
+        });
+        if (!cancelled) {
+          setBooks(bookData);
+          setStats(statsMap);
+          setYears([...yearSet].sort((a, b) => b - a));
         }
-        if (book.date) yearSet.add(book.date.slice(0, 4));
-      });
-      setBooks(bookData);
-      setStats(statsMap);
-      setYears([...yearSet].sort((a, b) => b - a));
-    } catch { toast.error(MSG.LOAD_FAIL); }
-    finally { setLoading(false); }
+      } catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   const filtered = useMemo(() => books.filter(b => !selectedYear || b.date?.startsWith(selectedYear)), [books, selectedYear]);
 
@@ -62,7 +66,7 @@ export default function GiftBookList() {
         {filtered.length === 0 ? (
           <EmptyState emoji="📖" text="暂无礼簿" actionLabel="创建礼簿" onAction={() => navigate(ROUTES.GIFT_BOOKS.NEW)} />
         ) : (
-          <div className="space-y-3">
+          <div className="responsive-list">
             {filtered.map(book => {
               const s = stats[book.id] || { totalRecords: 0, totalAmount: 0, typeCount: {} };
               const typeEntries = Object.entries(s.typeCount).filter(([, c]) => c > 0);

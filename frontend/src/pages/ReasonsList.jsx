@@ -18,7 +18,15 @@ export default function ReasonsList() {
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try { const res = await reasonsApi.list(); if (!cancelled) setReasons(res.data); }
+      catch { toast.error(MSG.LOAD_FAIL); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const { handleDelete } = useDeleteWithConfirm(
     reasonsApi.delete, MSG.CONFIRM_DELETE_REASON, loadData

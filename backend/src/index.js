@@ -192,10 +192,19 @@ async function initDatabase() {
 }
 
 const { startAutoBackup } = require('./scheduler/autoBackup');
+const { syncContactsFromGifts } = require('./contactSync');
 
 async function start() {
   // 先初始化数据库（SQLite 为本地文件，初始化极快）
   await initDatabase();
+
+  // 存量数据修复：把历史上仅在收礼/随礼记录中出现、未入亲友录的姓名自动补录（幂等）
+  try {
+    await syncContactsFromGifts();
+    console.log('Contacts synced from gift records');
+  } catch (err) {
+    console.error('Sync contacts from gift records failed:', err.message);
+  }
 
   // 启动定时自动备份
   startAutoBackup();

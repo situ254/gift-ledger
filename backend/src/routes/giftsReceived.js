@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const { authMiddleware } = require('../middleware/auth');
+const { ensureContact } = require('../contactSync');
 
 // 获取收礼列表
 router.get('/', authMiddleware, async (req, res) => {
@@ -39,6 +40,8 @@ router.post('/', authMiddleware, async (req, res) => {
     const [bookRows] = await pool.query('SELECT date FROM gift_books WHERE id = ? AND user_id = ?', [gift_book_id, req.user.id]);
     if (bookRows.length === 0) return res.status(400).json({ error: '礼簿不存在' });
     const bookDate = bookRows[0].date;
+    // 自动补录亲友录：新增不在亲友录中的收礼时，将其姓名与关系同步到亲友录
+    await ensureContact(req.user.id, contact_name, contact_type_id);
     const [result] = await pool.query(
       'INSERT INTO gifts_received (user_id, contact_name, contact_type_id, amount, gift_book_id, gift_book_date, guests, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [req.user.id, contact_name, contact_type_id || null, amount, gift_book_id, bookDate, guests || 0, notes || '']
@@ -60,6 +63,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const [bookRows] = await pool.query('SELECT date FROM gift_books WHERE id = ? AND user_id = ?', [gift_book_id, req.user.id]);
     if (bookRows.length === 0) return res.status(400).json({ error: '礼簿不存在' });
     const bookDate = bookRows[0].date;
+    // 更新收礼：若姓名被改为亲友录中不存在的新人，同样自动补录
+    await ensureContact(req.user.id, contact_name, contact_type_id);
     await pool.query(
       'UPDATE gifts_received SET contact_name = ?, contact_type_id = ?, amount = ?, gift_book_id = ?, gift_book_date = ?, guests = ?, notes = ? WHERE id = ? AND user_id = ?',
       [contact_name, contact_type_id || null, amount, gift_book_id, bookDate, guests || 0, notes || '', req.params.id, req.user.id]

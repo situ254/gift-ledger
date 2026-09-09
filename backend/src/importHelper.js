@@ -1,4 +1,5 @@
 const pool = require('./db');
+const { ensureContact } = require('./contactSync');
 
 /**
  * 智能检测Excel文件中的收礼/随礼sheet
@@ -227,19 +228,6 @@ async function importGivenRows(rows, userId, dedup = true) {
   }
 
   return result;
-}
-
-/**
- * 自动创建亲友（如果不存在）
- */
-async function ensureContact(userId, contactName, contactTypeId) {
-  if (!contactName) return;
-  const [existing] = await pool.query('SELECT id, type_id FROM contacts WHERE name = ? AND user_id = ?', [contactName, userId]);
-  if (existing.length === 0) {
-    await pool.query('INSERT INTO contacts (user_id, name, type_id) VALUES (?, ?, ?)', [userId, contactName, contactTypeId || null]);
-  } else if (contactTypeId && !existing[0].type_id) {
-    await pool.query('UPDATE contacts SET type_id = ? WHERE id = ? AND user_id = ?', [contactTypeId, existing[0].id, userId]);
-  }
 }
 
 /**

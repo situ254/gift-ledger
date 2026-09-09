@@ -26,18 +26,34 @@ async function ensureContact(userId, contactName, contactTypeId) {
 /**
  * 存量数据修复：把历史收礼/随礼记录中出现过、但尚未录入亲友表的姓名全部补录。
  * 幂等，可在服务每次启动时执行，保证升级后亲友录自动补齐旧数据。
+ *
+ * 补录时会尽量带上该姓名在礼单中出现过的最新一条「非空关系」，
+ * 避免历史记录自动补录出的亲友全部没有关系（亲友录中不显示关系）。
  */
 async function syncContactsFromGifts() {
   const [users] = await pool.query('SELECT id FROM users');
   for (const u of users) {
-    const [names] = await pool.query(
-      `SELECT contact_name FROM gifts_received WHERE user_id = ? AND contact_name IS NOT NULL AND contact_name != ''
-       UNION
-       SELECT contact_name FROM gifts_given WHERE user_id = ? AND contact_name IS NOT NULL AND contact_name != ''`,
+    const [rows] = await pool.query(
+      `SELECT contact_name, contact_type_id FROM (
+         SELECT contact_name, contact_type_id, id FROM gifts_received
+          WHERE user_id = ? AND contact_name IS NOT NULL AND contact_name != ''
+         UNION ALL
+         SELECT contact_name, contact_type_id, id FROM gifts_given
+          WHERE user_id = ? AND contact_name IS NOT NULL AND contact_name != ''
+       ) t ORDER BY t.id DESC`,
       [u.id, u.id]
     );
-    for (const row of names) {
-      await ensureContact(u.id, row.contact_name, null);
+    // 每个姓名取「最新一条非空关系」：最新记录无关系时，允许被更早的有关系记录补上
+    const bestType = new Map();
+    for (const row of rows) {
+      if (!bestType.has(row.contact_name)) {
+        bestType.set(row.contact_name, row.contact_type_id || null);
+      } else if (!bestType.get(row.contact_name) && row.contact_type_id) {
+        bestType.set(row.contact_name, row.contact_type_id);
+      }
+    }
+    for (const [name, typeId] of bestType) {
+      await ensureContact(u.id, name, typeId);
     }
   }
 }

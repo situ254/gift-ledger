@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { giftsGivenApi, reasonsApi, contactTypesApi, contactsApi } from '../api';
 import { useForm, useEditEntity } from '../hooks';
@@ -24,6 +24,8 @@ export default function GiftGivenForm() {
   const [reasons, setReasons] = useState([]);
   const [contactTypes, setContactTypes] = useState([]);
   const [contactNames, setContactNames] = useState([]);
+  // 姓名 → 该亲友已设置的关系 id（用于选中已有姓名时自动带出关系）
+  const [contactTypeByName, setContactTypeByName] = useState({});
 
   useEffect(() => {
     let cancelled = false;
@@ -33,6 +35,9 @@ export default function GiftGivenForm() {
         if (!cancelled) {
           setReasons(r.data);
           setContactTypes(t.data);
+          const byName = {};
+          c.data.forEach(x => { byName[x.name] = x.type_id ? String(x.type_id) : ''; });
+          setContactTypeByName(byName);
           setContactNames(c.data.map(x => x.name));
         }
       } catch { /* silent - dropdowns are optional */ }
@@ -100,6 +105,23 @@ export default function GiftGivenForm() {
   }, [id, form.contact_name, navigate]);
 
   useEffect(() => { if (entity) setForm(entity); }, [entity, setForm]);
+
+  // 输入的姓名与亲友录已有记录匹配时，自动带出其关系；
+  // 仅当「关系」为空或仍等于上一位亲友自动带出的值时自动更新，手动选择的不覆盖
+  const prevNameRef = useRef('');
+  useEffect(() => {
+    const oldName = prevNameRef.current;
+    const newName = form.contact_name;
+    prevNameRef.current = newName;
+    if (oldName === newName) return;
+    const oldTypeId = contactTypeByName[oldName.trim()] || '';
+    const newTypeId = contactTypeByName[newName.trim()] || '';
+    setForm(prev => {
+      const keepManual = prev.contact_type_id && prev.contact_type_id !== oldTypeId;
+      return { ...prev, contact_type_id: keepManual ? prev.contact_type_id : newTypeId };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.contact_name]);
 
   if (isEdit && !loaded) return <LoadingSpinner />;
 

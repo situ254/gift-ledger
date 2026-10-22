@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { giftsReceivedApi, contactTypesApi, giftBooksApi, contactsApi } from '../api';
 import { useForm, useEditEntity } from '../hooks';
 import { LoadingSpinner, PageHeader, FormField } from '../components/UI';
+import { formatDateWithLunar } from '../utils/helpers';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -10,14 +11,17 @@ import toast from 'react-hot-toast';
 const DELETE_CONFIRM_MSG = '确定删除这条记录吗？删除后不可恢复。';
 const DELETE_FAIL_MSG = '删除失败，请重试';
 
-const INITIAL_FORM = {
+const EMPTY_FORM = {
   contact_name: '', contact_type_id: '', amount: '', gift_book_id: '', guests: '', notes: '',
 };
 
 export default function GiftReceivedForm() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const isEdit = !!id;
+  // 支持从礼簿页「记一笔收礼」带过来预选礼簿
+  const presetBookId = searchParams.get('gift_book_id') || '';
   const [deleting, setDeleting] = useState(false);
 
   const [contactTypes, setContactTypes] = useState([]);
@@ -56,7 +60,7 @@ export default function GiftReceivedForm() {
   const { entity, loaded } = useEditEntity(giftsReceivedApi.list, id, ROUTES.RECEIVED.LIST, mapEntity);
 
   const { form, error, submitting, handleChange, handleSubmit, setForm } = useForm({
-    initialValues: INITIAL_FORM,
+    initialValues: { ...EMPTY_FORM, gift_book_id: presetBookId },
     isEdit,
     validate: (f) => {
       if (!f.contact_name.trim()) return MSG.VALID_NAME_REQUIRED;
@@ -123,6 +127,8 @@ export default function GiftReceivedForm() {
 
   if (isEdit && !loaded) return <LoadingSpinner />;
 
+  const selectedBook = giftBooks.find(b => String(b.id) === String(form.gift_book_id));
+
   return (
     <div>
       <PageHeader title={isEdit ? '修改收礼' : '新增收礼'} variant="flat"
@@ -155,7 +161,12 @@ export default function GiftReceivedForm() {
               </select>
             </FormField>
             <FormField label="日期">
-              <input type="date" name="gift_date" value={form.gift_date || ''} onChange={handleChange} className="input-field" />
+              {/* 收礼的日期取自所属礼簿，这里只做展示，避免改了日期却不生效 */}
+              <div className="input-field bg-gray-50 text-gray-600 select-none !text-sm">
+                {selectedBook
+                  ? `${formatDateWithLunar(selectedBook.date)}（取所属礼簿日期）`
+                  : '选择礼簿后自动带出'}
+              </div>
             </FormField>
             <FormField label="金额">
               <input type="number" name="amount" value={form.amount} onChange={handleChange}

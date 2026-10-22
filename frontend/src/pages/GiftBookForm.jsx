@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { giftBooksApi, reasonsApi } from '../api';
 import { useForm } from '../hooks';
 import { PageHeader, FormField } from '../components/UI';
+import { formatDateWithLunar } from '../utils/helpers';
 import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -46,7 +47,12 @@ export default function GiftBookForm() {
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormField label="礼簿名称 *"><input type="text" name="name" value={form.name} onChange={handleChange} className="input-field" placeholder="如：张三婚礼" /></FormField>
-            <FormField label="日期 *"><input type="date" name="date" value={form.date} onChange={handleChange} className="input-field" /></FormField>
+            <FormField label="日期 *">
+              <input type="date" name="date" value={form.date} onChange={handleChange} className="input-field" />
+              {form.date && (
+                <div className="text-xs text-gray-400 mt-1">{formatDateWithLunar(form.date)}</div>
+              )}
+            </FormField>
             <FormField label="事由">
               <select name="reason_id" value={form.reason_id} onChange={handleChange} className="select-field">
                 <option value="">请选择事由</option>

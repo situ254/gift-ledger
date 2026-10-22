@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { contactsApi } from '../api';
+import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner } from '../components/UI';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
@@ -24,10 +25,11 @@ export default function ContactsList() {
     return () => { cancelled = true; };
   }, []);
 
-  const filtered = useMemo(() => contacts.filter(c => {
-    if (search && !c.name.includes(search)) return false;
-    return true;
-  }), [contacts, search]);
+  const filtered = useMemo(() => {
+    const key = search.trim();
+    if (!key) return contacts;
+    return contacts.filter(c => c.name.includes(key) || (c.type_name || '').includes(key));
+  }, [contacts, search]);
 
   if (loading) return <LoadingSpinner />;
 
@@ -39,7 +41,7 @@ export default function ContactsList() {
           <h1 className="text-xl font-bold">亲友录</h1>
           <button
             onClick={() => navigate(ROUTES.CONTACTS.NEW)}
-            className="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors"
+            className="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors whitespace-nowrap"
           >
             + 新增
           </button>
@@ -59,29 +61,32 @@ export default function ContactsList() {
         </div>
       </div>
 
-      {/* 列表 */}
-      <div className="px-4 mt-2">
+      {/* 紧凑网格列表 */}
+      <div className="px-4 mt-3 pb-24">
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <div className="text-4xl mb-2">👥</div>
-            <div>暂无亲友记录</div>
+            <div>{search ? '没有匹配的亲友' : '暂无亲友记录'}</div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            {filtered.map((c, idx) => (
-              <div
-                key={c.id}
-                onClick={() => navigate(ROUTES.CONTACTS.DETAIL(c.name))}
-                className={`px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${
-                  idx < filtered.length - 1 ? 'border-b border-gray-100' : ''
-                }`}
-              >
-                <div className="text-primary-700 font-medium text-lg">{c.name}</div>
-                {c.type_name && (
-                  <div className="text-gray-500 text-sm mt-0.5">{c.type_name}</div>
-                )}
-              </div>
-            ))}
+          <div className="contact-grid">
+            {filtered.map(c => {
+              const net = Number(c.net || 0);
+              const netText = net === 0 ? '已两清' : net > 0 ? `我差 ${formatCurrency(net)}` : `差我 ${formatCurrency(Math.abs(net))}`;
+              const netCls = net === 0 ? 'text-gray-400' : net > 0 ? 'amount-given' : 'amount-received';
+              return (
+                <div key={c.id} className="contact-card" onClick={() => navigate(ROUTES.CONTACTS.DETAIL(c.name))}>
+                  <div className="flex items-center justify-between gap-1.5 min-w-0">
+                    <span className="font-semibold text-gray-800 truncate" title={c.name}>{c.name}</span>
+                    {c.type_name && <span className="record-chip">{c.type_name}</span>}
+                  </div>
+                  <div className="record-line" title={`收 ${formatCurrency(c.total_received)} · 送 ${formatCurrency(c.total_given)}`}>
+                    收 {formatCurrency(c.total_received)} · 送 {formatCurrency(c.total_given)}
+                  </div>
+                  <div className={`text-[11px] font-medium truncate ${netCls}`}>{netText}</div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { contactsApi } from '../api';
 import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner, PageHeader } from '../components/UI';
+import RecordCard from '../components/RecordCard';
 import { ROUTES } from '../constants/routes';
 import { MSG } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -81,44 +82,31 @@ export default function ContactDetail() {
           </button>
         </div>
 
-        {/* 记录列表 */}
-        <div className="space-y-3 mb-4">
+        {/* 记录列表 - 紧凑卡片，单行多条 */}
+        <div className="record-grid mb-4">
           {records.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-gray-400 col-span-full">
               {activeTab === 'received' ? '暂无收礼记录' : '暂无随礼记录'}
             </div>
           ) : records.map(r => (
-            <div key={r.id}
-              className={`bg-white rounded-lg p-4 border-l-4 shadow-sm ${activeTab === 'received' ? 'border-gold-500' : 'border-primary-500'}`}
+            <RecordCard
+              key={r.id}
+              name={r.contact_name || decodedName}
+              chips={activeTab === 'received'
+                ? [r.gift_book_name, r.contact_type_name]
+                : [r.reason_name, r.contact_type_name]}
+              date={activeTab === 'received' ? (r.gift_book_date || r.date) : (r.gift_date || r.date)}
+              amount={r.amount}
+              amountCls={activeTab === 'received' ? 'amount-received' : 'amount-given'}
+              location={activeTab === 'received'
+                ? (r.gift_book_name ? `礼簿 · ${r.gift_book_name}` : '')
+                : (r.reason_name ? `事由 · ${r.reason_name}` : '')}
+              notes={r.notes}
               onClick={() => {
                 if (activeTab === 'received') navigate(ROUTES.RECEIVED.EDIT(r.id));
                 else navigate(ROUTES.GIVEN.EDIT(r.id));
-              }}>
-              <div className={`font-medium text-lg mb-2 ${activeTab === 'received' ? 'text-gold-600' : 'text-primary-600'}`}>
-                {r.contact_name || decodedName}
-              </div>
-              <div className="space-y-1 text-sm text-gray-500">
-                {activeTab === 'received' ? (
-                  <>
-                    {r.gift_book_name && <div>礼簿：{r.gift_book_name}</div>}
-                    {r.contact_type_name && <div>关系：{r.contact_type_name}</div>}
-                    <div>日期：{r.gift_book_date || r.date}</div>
-                  </>
-                ) : (
-                  <>
-                    {r.contact_type_name && <div>关系：{r.contact_type_name}</div>}
-                    {r.reason_name && <div>事由：{r.reason_name}</div>}
-                    <div>日期：{r.gift_date || r.date}</div>
-                  </>
-                )}
-                {r.notes && <div className="text-gray-400">备注：{r.notes}</div>}
-              </div>
-              <div className="mt-2 flex justify-end">
-                <span className={`font-bold text-lg ${activeTab === 'received' ? 'amount-received' : 'amount-given'}`}>
-                  {activeTab === 'received' ? '+' : '-'}{formatCurrency(r.amount)}
-                </span>
-              </div>
-            </div>
+              }}
+            />
           ))}
         </div>
 

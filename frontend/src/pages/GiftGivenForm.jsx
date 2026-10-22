@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { giftsGivenApi, reasonsApi, contactTypesApi, contactsApi } from '../api';
 import { useForm, useEditEntity } from '../hooks';
 import { LoadingSpinner, PageHeader, FormField } from '../components/UI';
+import { formatDateWithLunar } from '../utils/helpers';
 import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -158,6 +159,9 @@ export default function GiftGivenForm() {
             </FormField>
             <FormField label="日期">
               <input type="date" name="gift_date" value={form.gift_date} onChange={handleChange} className="input-field" />
+              {form.gift_date && (
+                <div className="text-xs text-gray-400 mt-1">{formatDateWithLunar(form.gift_date)}</div>
+              )}
             </FormField>
             <FormField label="金额">
               <input type="number" name="amount" value={form.amount} onChange={handleChange}

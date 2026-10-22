@@ -387,3 +387,179 @@ body {
    ============================================================ */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   紧凑记录卡片（记录列表 / 礼簿明细）
+   —— 单行多条：手机 1 列、平板 2 列、桌面 3 列
+   —— 每行固定占位，卡片高度一致，不因有无关系/备注而参差
+   ============================================================ */
+.record-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .record-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+  .record-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.record-card-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 118px;
+  padding: 0.75rem 0.875rem;
+  background: #fff;
+  border: 1px solid #F3F1EC;
+  border-radius: 0.9rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-snap), box-shadow 0.2s var(--ease-snap);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.record-card-compact:active {
+  transform: scale(0.985);
+  box-shadow: 0 0 0 1px rgba(198, 40, 40, 0.12);
+}
+
+.record-card-compact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.125rem;
+  min-width: 0;
+}
+
+.record-card-compact-title {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.record-card-compact-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-ink-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 8.5rem;
+}
+
+.record-card-compact-amount {
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.record-chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 6rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--color-ricewhite, #FAF7F2);
+  border: 1px solid #F0EBE3;
+  color: #8A7A63;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-line {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9A9188;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-line-note {
+  color: #6B665F;
+}
+
+/* ============================================================
+   礼簿折叠卡片
+   ============================================================ */
+.giftbook-card {
+  background: #fff;
+  border: 1px solid #F3F1EC;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s var(--ease-snap);
+}
+
+.giftbook-card-expanded {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-color: #EADFCF;
+}
+
+.giftbook-toggle {
+  flex: 0 0 auto;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-gold-200);
+  background: var(--color-gold-50);
+  color: var(--color-gold-800);
+}
+
+/* ============================================================
+   亲友录紧凑网格
+   ============================================================ */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+@media (min-width: 768px) {
+  .contact-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+  .contact-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-height: 74px;
+  padding: 0.625rem 0.75rem;
+  background: #fff;
+  border: 1px solid #F3F1EC;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-snap);
+}
+
+.contact-card:active { transform: scale(0.98); }
+
+/* 礼簿列表：桌面最多两列，避免展开后的操作按钮被挤扁 */
+.giftbook-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  .giftbook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

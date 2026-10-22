@@ -76,7 +76,7 @@ async function importReceivedRows(rows, userId, dedup = true) {
       const giftBookName = row['所属礼簿'];
       const giftBookDate = formatDate(row['礼簿日期']);
       const notes = row['备注']?.trim() || null;
-      const createdAt = formatDateTime(row['创建时间']);
+      const createdAt = formatDateTime(row['创建日期'] ?? row['创建时间']);
 
       if (!contactName || isNaN(amount) || amount <= 0 || !giftBookName || !giftBookDate) {
         result.fail++;
@@ -162,7 +162,7 @@ async function importGivenRows(rows, userId, dedup = true) {
       const reasonName = row['事由'];
       const giftDate = formatDate(row['随礼日期']);
       const notes = row['备注']?.trim() || null;
-      const createdAt = formatDateTime(row['创建时间']);
+      const createdAt = formatDateTime(row['创建日期'] ?? row['创建时间']);
 
       if (!contactName || isNaN(amount) || amount <= 0 || !giftDate) {
         result.fail++;

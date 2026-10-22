@@ -37,7 +37,8 @@ router.post('/register', async (req, res) => {
 // 登录
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const username = typeof req.body?.username === 'string' ? req.body.username.trim() : '';
+    const password = typeof req.body?.password === 'string' ? req.body.password : '';
     if (!username || !password) {
       return res.status(400).json({ error: '用户名和密码不能为空' });
     }
@@ -46,7 +47,20 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: '用户名或密码错误' });
     }
     const user = rows[0];
-    const valid = await bcrypt.compare(password, user.password_hash);
+    const storedHash = String(user.password_hash || '');
+
+    // 兼容历史数据：早期版本或手工导入的账号可能存的是明文密码，
+    // 这种情况下 bcrypt.compare 永远失败，表现为「默认密码怎么都登不上」。
+    // 这里对非 bcrypt 格式的密码做一次明文比对，并在登录成功后自动升级为哈希。
+    let valid = false;
+    if (/^\$2[aby]\$/.test(storedHash)) {
+      valid = await bcrypt.compare(password, storedHash);
+    } else if (storedHash && storedHash === password) {
+      valid = true;
+      const upgraded = await bcrypt.hash(password, 10);
+      await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [upgraded, user.id]);
+    }
+
     if (!valid) {
       return res.status(400).json({ error: '用户名或密码错误' });
     }

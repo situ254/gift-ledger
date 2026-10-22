@@ -37,6 +37,35 @@ gift-ledger/
 - lunar-javascript 农历转换
 - react-hot-toast 通知
 
+## 日期与农历
+
+所有日期展示入口（记录列表、礼簿列表、详情页、导出 Excel / 文本）统一为：
+
+```
+2026-10-22（农历2026丙午马年九月十三）
+```
+
+- 公历：`YYYY-MM-DD`
+- 农历：`农历 + 农历年份 + 干支 + 生肖 + 年 + 规范中文月 + 规范中文日`
+- 月份固定写作 `正月/二月/…/十月/冬月/腊月/闰X月`，日期固定写作 `初一…三十`，
+  不会出现 `十月15`、`腊月7` 这类数字混排
+- 前端实现：`frontend/src/utils/helpers.js`（`lunarDate` / `formatDateWithLunar`）
+- 后端实现：`backend/src/utils/lunar.js`（内置 `backend/src/vendor/lunar.js`，无需额外 npm 依赖）
+
+## 数据导出
+
+- **导出 Excel**：收礼 / 随礼两个工作表，含「日期」与「农历日期」两列
+- **导出文本（.txt）**：每条记录一行，日期同样为「公历（农历…）」，
+  文件带 UTF-8 BOM，Windows 记事本直接打开不乱码
+
+## 登录与密码
+
+- 默认管理员：`admin` / `admin123`（首次启动自动创建，可用环境变量覆盖）
+- 忘记密码：容器启动时带上 `-e ADMIN_RESET_PASSWORD=true`，重启后密码即恢复为 `ADMIN_PASSWORD`
+- 历史库里若存在明文密码（非 bcrypt），登录时会自动比对并升级为 bcrypt 哈希
+- 只有服务端返回 401 才会清除登录态，网络抖动 / 5xx 不会把用户踢回登录页
+- 未登录访问任意页面会跳转登录并记住来路（`/login?redirect=...`），登录成功后原路返回
+
 ## 快速开始
 
 ### 后端
@@ -100,6 +129,7 @@ docker run -d -p 9205:9205 -v gift-ledger-data:/app/data --name gift-ledger gift
 | NODE_ENV | production | 运行环境 |
 | ADMIN_USERNAME | admin | 默认管理员用户名（首次启动创建） |
 | ADMIN_PASSWORD | admin123 | 默认管理员密码 |
+| ADMIN_RESET_PASSWORD | - | 设为 true 时，启动会把管理员密码重置为 ADMIN_PASSWORD（忘记密码自救），重置后请移除该变量 |
 | AUTO_BACKUP | true | 自动备份总开关，设为 false 可关闭 |
 | AUTO_BACKUP_KEEP | 2 | 每个用户保留的最新备份文件个数 |
 | AUTO_BACKUP_SCHEDULE | 0 22 1,16 * * | 自动备份定时(cron: 分 时 日 月 星期)，默认每月1号、16号 22:00(晚上10点)，时区 Asia/Shanghai |

@@ -14,10 +14,19 @@ api.interceptors.request.use(config => {
 });
 
 api.interceptors.response.use(res => res, err => {
+  // 只有「未登录 / 登录过期」（401）才清除登录态并回登录页。
+  // 超时、断网、5xx 等都不应该把用户踢出去，否则会出现
+  // 「刚登录成功，一次网络抖动就被弹回登录页」的现象。
   if (err.response?.status === 401) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    const { pathname, search } = window.location;
+    const onAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+    if (!onAuthPage) {
+      // 记住来路，登录后原路返回，避免登录成功却停在登录页
+      const redirect = encodeURIComponent(pathname + (search || ''));
+      window.location.replace(`/login?redirect=${redirect}`);
+    }
   }
   return Promise.reject(err);
 });
@@ -84,6 +93,7 @@ export const dataApi = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   exportFile: params => api.get('/data/export', { params, responseType: 'blob' }),
+  exportText: params => api.get('/data/export-text', { params, responseType: 'blob' }),
   downloadTemplate: () => api.get('/data/template', { responseType: 'blob' })
 };
 

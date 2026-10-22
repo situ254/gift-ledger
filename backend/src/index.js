@@ -181,7 +181,25 @@ async function initDatabase() {
         await pool.query('INSERT INTO contact_types (user_id, name) VALUES (?, ?)', [adminId, name]);
       }
       console.log(`Default admin account created: ${adminUsername} / ${adminPassword}`);
+    } else if (process.env.ADMIN_RESET_PASSWORD === 'true') {
+      // 忘记默认密码时的自救开关：启动容器时带上 ADMIN_RESET_PASSWORD=true，
+      // 会把管理员密码重置为 ADMIN_PASSWORD（默认 admin123），并自动关闭该开关的下次生效。
+      // 用途：解决"默认密码登录异常"时无需删库、无需进容器手动改数据。
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await pool.query('UPDATE users SET password_hash = ? WHERE username = ?', [hashedPassword, adminUsername]);
+      console.log(`Admin password reset to ADMIN_PASSWORD for ${adminUsername}. Remove ADMIN_RESET_PASSWORD to avoid resetting on every restart.`);
     }
+
+    // 修复历史数据：收礼记录的日期必须与所属礼簿保持同步
+    // （早期版本可能在礼簿改期后留下旧快照，导致列表/统计年份对不上）
+    await pool.query(`
+      UPDATE gifts_received
+         SET gift_book_date = (SELECT gb.date FROM gift_books gb WHERE gb.id = gifts_received.gift_book_id)
+       WHERE gift_book_id IS NOT NULL
+         AND EXISTS (SELECT 1 FROM gift_books gb WHERE gb.id = gifts_received.gift_book_id)
+         AND gift_book_date <> (SELECT gb.date FROM gift_books gb WHERE gb.id = gifts_received.gift_book_id)
+    `);
 
     console.log('Database initialized successfully');
     console.log(`SQLite database: ${pool.DB_PATH}`);

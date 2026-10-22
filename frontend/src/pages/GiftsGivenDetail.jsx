@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { giftsGivenApi, reasonsApi } from '../api';
-import { formatCurrency, monthDay } from '../utils/helpers';
+import { giftsGivenApi } from '../api';
+import { formatCurrency } from '../utils/helpers';
 import { LoadingSpinner, PageHeader, FilterPills, SummaryBar } from '../components/UI';
+import RecordCard from '../components/RecordCard';
 import { ROUTES } from '../constants/routes';
 import { MSG, DEFAULTS } from '../constants/messages';
 import toast from 'react-hot-toast';
@@ -18,8 +19,9 @@ export default function GiftsGivenDetail() {
     let cancelled = false;
     (async () => {
       try {
-        const [giftsRes] = await Promise.all([giftsGivenApi.list({ year }), reasonsApi.list()]);
-        if (!cancelled) setGifts(giftsRes.data);
+        const res = await giftsGivenApi.list({ year });
+        const yearGifts = res.data.filter(g => g.gift_date && String(g.gift_date).startsWith(year));
+        if (!cancelled) setGifts(yearGifts);
       } catch { toast.error(MSG.LOAD_FAIL); }
       finally { if (!cancelled) setLoading(false); }
     })();
@@ -66,20 +68,18 @@ export default function GiftsGivenDetail() {
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">暂无随礼记录</div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            {filtered.map((g, idx) => (
-              <div key={g.id}
+          <div className="record-grid">
+            {filtered.map(g => (
+              <RecordCard
+                key={g.id}
+                name={g.contact_name}
+                chips={[g.reason_name || '其它', g.contact_type_name]}
+                date={g.gift_date}
+                amount={g.amount}
+                amountCls="amount-given"
+                notes={g.notes}
                 onClick={() => navigate(ROUTES.GIVEN.EDIT(g.id))}
-                className={`flex items-center px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${idx < filtered.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800 truncate">{g.contact_name}</span>
-                    {g.reason_name && <span className="inline-block bg-red-50 text-red-600 text-xs px-1.5 py-0.5 rounded">{g.reason_name}</span>}
-                  </div>
-                  <div className="text-xs text-gray-400">{monthDay(g.gift_date)}</div>
-                </div>
-                <span className="font-bold amount-given ml-3">{formatCurrency(g.amount)}</span>
-              </div>
+              />
             ))}
           </div>
         )}

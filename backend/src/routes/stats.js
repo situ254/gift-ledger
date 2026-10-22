@@ -33,14 +33,27 @@ router.get('/summary', authMiddleware, async (req, res) => {
     const totalGiven = Number(givenResult[0].total);
     const givenCount = Number(givenResult[0].count);
 
-    // 按亲友维度统计
+    // 按亲友维度统计「人情余额」
+    //
+    // 重要：这里刻意不使用年份筛选。
+    // 首页的「别人差我礼 / 我差别人礼」表达的是「这个人跟我之间长期的人情余额」，
+    // 若按年份切片会出现两类「新增了记录但首页看不到」的问题：
+    //   1) 新增记录的日期不属于首页当前选中的年份 → 直接被过滤掉；
+    //   2) 同一人的收礼与随礼被年份切开后分别成组，净额被算错。
+    // 因此余额清单始终按累计口径统计；年份只影响顶部的金额汇总。
     const [receivedByContact] = await pool.query(
-      `SELECT contact_name, SUM(amount) as total_received, COUNT(*) as count FROM gifts_received WHERE user_id = ?${receivedYearFilter} GROUP BY contact_name`,
-      receivedParams
+      `SELECT contact_name, SUM(amount) as total_received, COUNT(*) as count
+         FROM gifts_received
+        WHERE user_id = ? AND contact_name IS NOT NULL AND TRIM(contact_name) <> ''
+        GROUP BY contact_name`,
+      [req.user.id]
     );
     const [givenByContact] = await pool.query(
-      `SELECT contact_name, SUM(amount) as total_given, COUNT(*) as count FROM gifts_given WHERE user_id = ?${givenYearFilter} GROUP BY contact_name`,
-      givenParams
+      `SELECT contact_name, SUM(amount) as total_given, COUNT(*) as count
+         FROM gifts_given
+        WHERE user_id = ? AND contact_name IS NOT NULL AND TRIM(contact_name) <> ''
+        GROUP BY contact_name`,
+      [req.user.id]
     );
 
     const contactMap = {};
@@ -63,6 +76,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
 
     const oweMe = netList.filter(c => c.net < 0);   // 收礼<随礼 → 别人差我礼（我随的多）
     const iOwe = netList.filter(c => c.net > 0);     // 收礼>随礼 → 我差别人礼（我收的多）
+    const settled = netList.filter(c => c.net === 0); // 收=送 → 已两清（仍要在首页体现，否则新增后"看不见"）
 
     // 按事由统计（随礼）
     const [byReason] = await pool.query(
@@ -146,6 +160,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
       netAmount: totalReceived - totalGiven,
       oweMe,
       iOwe,
+      settled,
       netList,
       byReason: byReasonAll,
       byContactType,

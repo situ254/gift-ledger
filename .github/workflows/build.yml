@@ -39,10 +39,12 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          # 用 Actions 内置 token：只要上面的 permissions.packages=write 就够，
-          # 且不会像手动 PAT 那样 90 天过期（GHCR_PAT 已于 2026-10 失效，
-          # 导致 push 后镜像构建 job 在 Login 步骤报 denied: denied）
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # 用仓库 secret GHCR_PAT（classic PAT，需 write:packages）。
+          # 注意：内置 GITHUB_TOKEN 即使声明了 packages: write，推这个包仍会报
+          # permission_denied: write_package（包的所有权绑在账号 PAT 上）。
+          # classic PAT 默认 90 天过期，过期后此步会报 denied: denied，
+          # 届时重新生成 token 并更新本仓库 secret GHCR_PAT 即可。
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
